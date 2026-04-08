@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UFMT | Planejador Acadêmico</title>
-    <!-- Fontes e Estilos -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -14,7 +13,7 @@
     <div class="header-container">
         <div class="brand">
             <h1>UFMT</h1>
-            <span>Planejador de Estudos</span>
+            <span>Planejador Acadêmico</span>
         </div>
 
         <div class="controles">
@@ -36,44 +35,32 @@
     </div>
 </header>
 
-<main class="app-content">
-    <!-- PASSO 1: HISTÓRICO (ROLAGEM HORIZONTAL) -->
+<main class="app-layout">
     <section class="secao-historico">
         <header class="section-header">
             <h2>1. Histórico Escolar</h2>
             <p>Marque as disciplinas já cursadas. Os pré-requisitos são exibidos para orientação.</p>
         </header>
-        <div id="checklistObrigatorias" class="kanban-container">
-            <!-- Injetado via JS -->
-        </div>
+        <div id="checklistObrigatorias" class="kanban-container"></div>
     </section>
 
     <div class="planejamento-split">
-        <!-- PASSO 2: PENDÊNCIAS (LISTA VERTICAL) -->
         <aside class="sidebar-pendencias">
             <header class="section-header">
                 <h3>2. Pendências</h3>
-                <small>Disciplinas ofertadas no semestre ativo</small>
             </header>
-            <div id="listaDisponiveis" class="lista-mini-cards">
-                <!-- Injetado via JS -->
-            </div>
+            <div id="listaDisponiveis" class="lista-vertical-cards"></div>
         </aside>
 
-        <!-- PASSO 3: GRADE PLANEJADA (ROLAGEM HORIZONTAL) -->
         <section class="area-grade">
             <header class="section-header">
                 <h3>3. Planejamento Próximos Semestres</h3>
-                <p>Clique em um semestre para selecioná-lo e adicionar disciplinas.</p>
             </header>
-            <div id="gradeSemestres" class="kanban-container">
-                <!-- Injetado via JS -->
-            </div>
+            <div id="gradeSemestres" class="kanban-container"></div>
         </section>
     </div>
 </main>
 
-<!-- Scripts -->
 <script src="js/script.js"></script>
 </body>
 </html>

@@ -21,8 +21,29 @@ async function carregar() {
         obrig = await res.json();
         const sems = Object.keys(plano);
         if (sems.length > 0) semestreAtivo = sems[sems.length - 1];
+
+        carregarInfoAdicional(); // Carrega Nome/RGA do storage
         renderizarTudo();
     } catch (e) { console.error(e); alert("Erro ao carregar dados."); }
+}
+
+// Persistência das informações do aluno
+function salvarInfoAdicional() {
+    const info = {
+        nome: document.getElementById('alunoNome').value,
+        rga: document.getElementById('alunoRGA').value,
+        sei: document.getElementById('alunoSEI').value
+    };
+    localStorage.setItem('info_aluno_ufmt', JSON.stringify(info));
+}
+
+function carregarInfoAdicional() {
+    const info = JSON.parse(localStorage.getItem('info_aluno_ufmt'));
+    if (info) {
+        document.getElementById('alunoNome').value = info.nome || "";
+        document.getElementById('alunoRGA').value = info.rga || "";
+        document.getElementById('alunoSEI').value = info.sei || "";
+    }
 }
 
 function calcularProximoSemestre(ultimo) {
@@ -35,7 +56,6 @@ function renderizarTudo() {
     const ppc = document.getElementById('filtroPPC').value;
     const ppcKey = `ppc_${ppc}`;
 
-    // Mapa reverso do plano para identificar planejadas no histórico
     const mapaPlano = {};
     Object.entries(plano).forEach(([semestre, codigos]) => {
         codigos.forEach(c => mapaPlano[c] = semestre);
@@ -62,8 +82,8 @@ function renderizarTudo() {
         semestres[s].forEach(d => {
             const isChecked = cursadas.includes(d.codigo);
             const planejadoPara = mapaPlano[d.codigo];
-
-            const nomesPre = (d.prerequisitos || []).map(cod => {
+            const preReqCodes = d.prerequisitos || [];
+            const nomesPre = preReqCodes.map(cod => {
                 const disc = obrig.find(o => o.codigo === cod);
                 return disc ? disc.nome : cod;
             }).join(', ');
@@ -96,13 +116,11 @@ function renderizarPendencias(ppcKey) {
     const box = document.getElementById('listaDisponiveis');
     box.innerHTML = '';
     if (!semestreAtivo) {
-        box.innerHTML = '<p style="padding:10px; font-size:0.8rem; color:red">Selecione um semestre no Passo 3.</p>';
+        box.innerHTML = '<p class="aviso-vazio">Clique em um semestre da grade para ver as ofertas.</p>';
         return;
     }
-
     const jaPlanejadas = Object.values(plano).flat();
     const ofertaDesteSemestre = REGRAS_OFERTA[semestreAtivo];
-
     const pendentes = obrig.filter(d => {
         const jaCursada = cursadas.includes(d.codigo);
         const jaNoPlano = jaPlanejadas.includes(d.codigo);
@@ -121,20 +139,18 @@ function renderizarPendencias(ppcKey) {
             return disc ? disc.nome : cod;
         });
         const cumprePreReq = preReqCodes.every(p => cursadas.includes(p));
-
         const div = document.createElement('div');
         div.className = `mini-card ${!cumprePreReq ? 'alerta-pre' : ''}`;
         div.innerHTML = `
             <div class="info-pendente">
-                <strong>${d.codigo}</strong><small>${d.nome}</small>
-                <div class="tag-pre">${nomesPreReqs.length ? 'Req: ' + nomesPreReqs.join(', ') : 'Sem pré-requisito'}</div>
+                <strong>${d.codigo}</strong><br><small>${d.nome}</small>
+                <div class="tag-pre">${nomesPreReqs.length ? 'Req: ' + nomesPreReqs.join(', ') : 'Livre'}</div>
             </div>
             <button onclick="addAoPlano('${d.codigo}')">Add</button>
         `;
         box.appendChild(div);
     });
 }
-
 
 function renderizarGrade() {
     const container = document.getElementById('gradeSemestres');
@@ -170,10 +186,7 @@ function renderizarGrade() {
 
 function toggle(cod) {
     if (cursadas.includes(cod)) cursadas = cursadas.filter(c => c !== cod);
-    else {
-        cursadas.push(cod);
-        Object.keys(plano).forEach(s => plano[s] = plano[s].filter(c => c !== cod));
-    }
+    else { cursadas.push(cod); Object.keys(plano).forEach(s => plano[s] = plano[s].filter(c => c !== cod)); }
     renderizarTudo();
 }
 
@@ -194,6 +207,7 @@ function removerDoPlano(s, c) { plano[s] = plano[s].filter(x => x !== c); render
 function removerSemestre(s) { if(confirm(`Remover ${s}?`)) { delete plano[s]; semestreAtivo = ""; renderizarTudo(); } }
 function limparDados() { if(confirm("Limpar tudo?")) { localStorage.clear(); location.reload(); } }
 function gerarPDF() { window.print(); }
+
 function exportarExcel() {
     let csv = "Semestre;Codigo;Disciplina\n";
     Object.entries(plano).forEach(([s, cds]) => cds.forEach(c => csv += `${s};${c};${obrig.find(x=>x.codigo===c).nome}\n`));

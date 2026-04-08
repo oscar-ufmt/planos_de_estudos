@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UFMT | Planejador Acadêmico</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Verifique se o nome abaixo é styles.css ou style.css -->
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -15,6 +14,13 @@
         <div class="brand">
             <h1>UFMT</h1>
             <span>Planejador Acadêmico</span>
+        </div>
+
+        <!-- NOVOS CAMPOS DE IDENTIFICAÇÃO -->
+        <div class="student-info">
+            <input type="text" id="alunoNome" placeholder="Nome do Discente" oninput="salvarInfoAdicional()">
+            <input type="text" id="alunoRGA" placeholder="RGA" oninput="salvarInfoAdicional()">
+            <input type="text" id="alunoSEI" placeholder="Processo SEI" oninput="salvarInfoAdicional()">
         </div>
 
         <div class="controles">
@@ -45,8 +51,6 @@
         <div id="checklistObrigatorias" class="kanban-container"></div>
     </section>
 
-
-    
     <div class="planejamento-split">
         <aside class="sidebar-pendencias">
             <header class="section-header">

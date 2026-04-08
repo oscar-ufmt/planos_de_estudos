@@ -11,7 +11,7 @@ const REGRAS_OFERTA = {
     "2028/1": { "20261": [1, 3, 5, 9, 10], "20251": [6, 8, 9, 10] },
     "2028/2": { "20261": [2, 4, 6, 9, 10], "20251": [7, 9, 10] },
     "2029/1": { "20261": [1, 3, 5, 7, 9, 10], "20251": [8, 9, 10] },
-    "2029/2": { "20261": [2, 4, 6, 8, 9, 10], "20251": [] }
+    "2029/2": { "20261": [2, 4, 6, 8, 9, 10], "20251": [] } // 2025/1 Extinto
 };
 
 async function carregar() {
@@ -54,7 +54,6 @@ function renderizarTudo() {
     const mapaPlano = {};
     Object.entries(plano).forEach(([sem, cods]) => cods.forEach(c => mapaPlano[c] = sem));
 
-    // PASSO 1: Histórico
     const boxHistorico = document.getElementById('checklistObrigatorias');
     boxHistorico.innerHTML = '';
     const semestres = {};
@@ -103,17 +102,36 @@ function renderizarPendencias(ppcKey) {
 
     const jaPlano = Object.values(plano).flat();
     const oferta = REGRAS_OFERTA[semestreAtivo];
+    const [anoAtivo, periodoAtivo] = semestreAtivo.split('/').map(Number);
 
     obrig.filter(d => {
-        let ok = oferta ? (d.ppc_20261 && oferta["20261"].includes(d.ppc_20261)) || (d.ppc_20251 && oferta["20251"].includes(d.ppc_20251)) : !!d[ppcKey];
-        return ok && !cursadas.includes(d.codigo) && !jaPlano.includes(d.codigo);
+        let estaOfertada = false;
+
+        if (oferta) {
+            // Lógica durante a transição (2026/1 até 2029/2)
+            if (d.ppc_20261 && oferta["20261"].includes(d.ppc_20261)) estaOfertada = true;
+            if (d.ppc_20251 && oferta["20251"].includes(d.ppc_20251)) estaOfertada = true;
+        } else if (anoAtivo >= 2030 || (anoAtivo === 2029 && periodoAtivo === 2)) {
+            // LÓGICA DE EXTINÇÃO: A partir de 2029/2 ou 2030+, o PPC 2025/1 NÃO EXISTE MAIS.
+            // Apenas disciplinas que estão no PPC 2026/1 são ofertadas,
+            // respeitando paridade (ímpar no /1 e par no /2)
+            const semestreDesejado = d.ppc_20261;
+            if (semestreDesejado) {
+                if (periodoAtivo === 1 && semestreDesejado % 2 !== 0) estaOfertada = true;
+                if (periodoAtivo === 2 && semestreDesejado % 2 === 0) estaOfertada = true;
+            }
+        } else {
+            // Fallback para datas antes de 2026
+            estaOfertada = !!d[ppcKey];
+        }
+
+        return estaOfertada && !cursadas.includes(d.codigo) && !jaPlano.includes(d.codigo);
     }).forEach(d => {
         const preReqCodes = d.prerequisitos || [];
         const preReqNomes = preReqCodes.map(c => obrig.find(o => o.codigo === c)?.nome || c).join(', ');
         const cumpre = preReqCodes.every(p => cursadas.includes(p));
 
         const div = document.createElement('div');
-        // AQUI ESTÁ O ALERTA AMARELO
         div.className = `mini-card ${!cumpre ? 'alerta-pre' : ''}`;
         div.innerHTML = `
             <div class="info-pendente">
@@ -145,7 +163,7 @@ function renderizarGrade() {
                 lista.appendChild(item);
             }
         });
-        col.innerHTML = `<h4>${sem === semestreAtivo ? '📌 ' : ''}${sem} <span class="badge-creditos ${cr > 36 ? 'excesso-creditos' : ''}">${cr} CR</span> <span onclick="event.stopPropagation(); delSem('${sem}')">🗑</span></h4>`;
+        col.innerHTML = `<h4>${sem === semestreAtivo ? '📌 ' : ''}${sem} <span class="badge-creditos ${cr > 36 ? 'excesso-creditos' : ''}">${cr} CR</span> <span onclick="event.stopPropagation(); removerSemestre('${sem}')">🗑</span></h4>`;
         col.appendChild(lista);
         box.appendChild(col);
     });
@@ -158,7 +176,13 @@ function toggle(c) {
 }
 function addAoPlano(c) { if(semestreAtivo) { plano[semestreAtivo].push(c); renderizarTudo(); } }
 function delDisc(s, c) { plano[s] = plano[s].filter(x => x !== c); renderizarTudo(); }
-function delSem(s) { if(confirm(`Remover ${s}?`)) { delete plano[s]; semestreAtivo = ""; renderizarTudo(); } }
+function removerSemestre(s) {
+    if(confirm(`Deseja remover o semestre ${s} e todas as disciplinas planejadas nele?`)) {
+        delete plano[s];
+        semestreAtivo = "";
+        renderizarTudo();
+    }
+}
 function addSemestre() {
     let sems = Object.keys(plano).sort();
     let n = sems.length ? calcularProximoSemestre(sems[sems.length-1]) : prompt("Início (Ex: 2026/1)");
@@ -167,10 +191,11 @@ function addSemestre() {
 function limparDados() { if(confirm("Resetar?")) { localStorage.clear(); location.reload(); } }
 function gerarPDF() { window.print(); }
 function exportarExcel() {
+    const nome = document.getElementById('alunoNome').value || "aluno";
     let csv = "PLANEJAMENTO;Codigo;Disciplina\n";
     Object.entries(plano).forEach(([s, cds]) => cds.forEach(c => csv += `${s};${c};${obrig.find(x=>x.codigo===c).nome}\n`));
     const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `plano_ufmt.csv`; link.click();
+    const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `plano_${nome}.csv`; link.click();
 }
 
 carregar();

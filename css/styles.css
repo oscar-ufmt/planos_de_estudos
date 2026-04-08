@@ -117,6 +117,7 @@ button {
 ::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
 ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; border: 3px solid #e2e8f0; }
 
+
 /* --- PDF / IMPRESSÃO (O FLUXOGRAMA) --- */
 @media print {
     header, .sidebar-pendencias, .area-grade, button, input[type="checkbox"], .coluna-semestre h4 span { display: none !important; }

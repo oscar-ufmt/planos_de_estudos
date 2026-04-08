@@ -135,6 +135,7 @@ function renderizarPendencias(ppcKey) {
     });
 }
 
+
 function renderizarGrade() {
     const container = document.getElementById('gradeSemestres');
     container.innerHTML = '';

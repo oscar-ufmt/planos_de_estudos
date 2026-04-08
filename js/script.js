@@ -17,14 +17,12 @@ const REGRAS_OFERTA = {
 async function carregar() {
     try {
         const res = await fetch('./data/disciplinas_obrigatorias.json');
-        if (!res.ok) throw new Error("Erro ao carregar JSON");
         obrig = await res.json();
-        const sems = Object.keys(plano);
+        const sems = Object.keys(plano).sort();
         if (sems.length > 0) semestreAtivo = sems[sems.length - 1];
-
         carregarInfoAdicional();
         renderizarTudo();
-    } catch (e) { console.error(e); alert("Erro ao carregar dados."); }
+    } catch (e) { alert("Erro ao carregar dados."); }
 }
 
 function salvarInfoAdicional() {
@@ -47,28 +45,23 @@ function carregarInfoAdicional() {
 
 function calcularProximoSemestre(ultimo) {
     let [ano, periodo] = ultimo.split('/').map(Number);
-    if (periodo === 1) return `${ano}/2`;
-    return `${ano + 1}/1`;
+    return periodo === 1 ? `${ano}/2` : `${ano + 1}/1`;
 }
 
 function renderizarTudo() {
     const ppc = document.getElementById('filtroPPC').value;
     const ppcKey = `ppc_${ppc}`;
-
-    // MAPEAMENTO DINÂMICO DO PLANO
     const mapaPlano = {};
-    Object.entries(plano).forEach(([semestre, codigos]) => {
-        codigos.forEach(c => mapaPlano[c] = semestre);
-    });
+    Object.entries(plano).forEach(([sem, cods]) => cods.forEach(c => mapaPlano[c] = sem));
 
+    // PASSO 1: Histórico
     const boxHistorico = document.getElementById('checklistObrigatorias');
     boxHistorico.innerHTML = '';
     const semestres = {};
     obrig.forEach(d => {
-        const s = d[ppcKey];
-        if (s) {
-            if (!semestres[s]) semestres[s] = [];
-            semestres[s].push(d);
+        if (d[ppcKey]) {
+            if (!semestres[d[ppcKey]]) semestres[d[ppcKey]] = [];
+            semestres[d[ppcKey]].push(d);
         }
     });
 
@@ -78,28 +71,19 @@ function renderizarTudo() {
         coluna.innerHTML = `<h4>${s}º Semestre</h4>`;
         const lista = document.createElement('div');
         lista.className = 'lista-disciplinas-vertical';
-
         semestres[s].forEach(d => {
             const isChecked = cursadas.includes(d.codigo);
-            const planejadoPara = mapaPlano[d.codigo];
-            const preReqCodes = d.prerequisitos || [];
-            const nomesPre = preReqCodes.map(cod => {
-                const disc = obrig.find(o => o.codigo === cod);
-                return disc ? disc.nome : cod;
-            }).join(', ');
-
+            const planejado = mapaPlano[d.codigo];
+            const preReqs = (d.prerequisitos || []).map(c => obrig.find(o => o.codigo === c)?.nome || c).join(', ');
             const item = document.createElement('div');
-            // A classe 'is-planned' permite mudar a cor no Campo 1
-            item.className = `item-check ${isChecked ? 'active' : ''} ${planejadoPara ? 'is-planned' : ''}`;
+            item.className = `item-check ${isChecked ? 'active' : ''} ${planejado ? 'is-planned' : ''}`;
             item.innerHTML = `
                 <input type="checkbox" id="c-${d.codigo}" ${isChecked ? 'checked' : ''} onchange="toggle('${d.codigo}')">
                 <label for="c-${d.codigo}">
-                    <strong>${d.codigo}</strong>
-                    <small>${d.nome}</small>
-                    ${planejadoPara ? `<div class="badge-plano-screen">📅 Planejada: ${planejadoPara}</div>` : ''}
-                    ${nomesPre ? `<div class="info-pre-historico">Req: ${nomesPre}</div>` : ''}
-                </label>
-            `;
+                    <strong>${d.codigo}</strong><small>${d.nome}</small>
+                    ${planejado ? `<div class="badge-plano-screen">📅 Planejada: ${planejado}</div>` : ''}
+                    ${preReqs ? `<div class="info-pre-historico">Req: ${preReqs}</div>` : ''}
+                </label>`;
             lista.appendChild(item);
         });
         coluna.appendChild(lista);
@@ -108,108 +92,85 @@ function renderizarTudo() {
 
     renderizarPendencias(ppcKey);
     renderizarGrade();
-
     localStorage.setItem('cursadas_ufmt', JSON.stringify(cursadas));
     localStorage.setItem('plano_ufmt', JSON.stringify(plano));
 }
 
 function renderizarPendencias(ppcKey) {
     const box = document.getElementById('listaDisponiveis');
-    box.innerHTML = '';
+    box.innerHTML = semestreAtivo ? '' : '<p style="padding:10px; font-size:0.8rem; color:red">Selecione um semestre abaixo.</p>';
     if (!semestreAtivo) return;
-    const jaPlanejadas = Object.values(plano).flat();
-    const ofertaDesteSemestre = REGRAS_OFERTA[semestreAtivo];
-    const pendentes = obrig.filter(d => {
-        const jaCursada = cursadas.includes(d.codigo);
-        const jaNoPlano = jaPlanejadas.includes(d.codigo);
-        let estaOfertada = false;
-        if (ofertaDesteSemestre) {
-            if (d.ppc_20261 && ofertaDesteSemestre["20261"].includes(d.ppc_20261)) estaOfertada = true;
-            if (d.ppc_20251 && ofertaDesteSemestre["20251"].includes(d.ppc_20251)) estaOfertada = true;
-        } else { estaOfertada = !!d[ppcKey]; }
-        return estaOfertada && !jaCursada && !jaNoPlano;
-    });
 
-    pendentes.forEach(d => {
+    const jaPlano = Object.values(plano).flat();
+    const oferta = REGRAS_OFERTA[semestreAtivo];
+
+    obrig.filter(d => {
+        let ok = oferta ? (d.ppc_20261 && oferta["20261"].includes(d.ppc_20261)) || (d.ppc_20251 && oferta["20251"].includes(d.ppc_20251)) : !!d[ppcKey];
+        return ok && !cursadas.includes(d.codigo) && !jaPlano.includes(d.codigo);
+    }).forEach(d => {
         const preReqCodes = d.prerequisitos || [];
-        const nomesPreReqs = preReqCodes.map(cod => {
-            const disc = obrig.find(o => o.codigo === cod);
-            return disc ? disc.nome : cod;
-        });
-        const cumprePreReq = preReqCodes.every(p => cursadas.includes(p));
+        const preReqNomes = preReqCodes.map(c => obrig.find(o => o.codigo === c)?.nome || c).join(', ');
+        const cumpre = preReqCodes.every(p => cursadas.includes(p));
+
         const div = document.createElement('div');
-        div.className = `mini-card ${!cumprePreReq ? 'alerta-pre' : ''}`;
+        // AQUI ESTÁ O ALERTA AMARELO
+        div.className = `mini-card ${!cumpre ? 'alerta-pre' : ''}`;
         div.innerHTML = `
             <div class="info-pendente">
                 <strong>${d.codigo}</strong><small>${d.nome}</small>
-                <div class="tag-pre">${nomesPreReqs.length ? 'Req: ' + nomesPreReqs.join(', ') : 'Sem pré-requisito'}</div>
+                <div class="tag-pre">${preReqNomes ? 'Req: ' + preReqNomes : 'Livre'}</div>
             </div>
-            <button onclick="addAoPlano('${d.codigo}')">Add</button>
-        `;
+            <button onclick="addAoPlano('${d.codigo}')">ADD</button>`;
         box.appendChild(div);
     });
 }
 
 function renderizarGrade() {
-    const container = document.getElementById('gradeSemestres');
-    container.innerHTML = '';
-    Object.entries(plano).forEach(([sem, codigos]) => {
-        let totalCreditos = 0;
-        const coluna = document.createElement('div');
-        coluna.className = `coluna-semestre ${sem === semestreAtivo ? 'semestre-selecionado' : ''}`;
-        coluna.onclick = () => { semestreAtivo = sem; renderizarTudo(); };
+    const box = document.getElementById('gradeSemestres');
+    box.innerHTML = '';
+    Object.entries(plano).forEach(([sem, cods]) => {
+        let cr = 0;
+        const col = document.createElement('div');
+        col.className = `coluna-semestre ${sem === semestreAtivo ? 'semestre-selecionado' : ''}`;
+        col.onclick = () => { semestreAtivo = sem; renderizarTudo(); };
         const lista = document.createElement('div');
         lista.className = 'lista-disciplinas-vertical';
-        codigos.forEach(cod => {
-            const d = obrig.find(x => x.codigo === cod);
+        cods.forEach(c => {
+            const d = obrig.find(x => x.codigo === c);
             if (d) {
-                const creditos = (parseInt(d.carga_horaria) || 0) / 16;
-                totalCreditos += creditos;
+                cr += (parseInt(d.carga_horaria) || 0) / 16;
                 const item = document.createElement('div');
                 item.className = 'card-disciplina';
-                item.innerHTML = `<label><strong>${cod}</strong><br><small>${d.nome} (${creditos} cr)</small></label><b onclick="event.stopPropagation(); removerDoPlano('${sem}','${cod}')" style="color:red; cursor:pointer">×</b>`;
+                item.innerHTML = `<label><strong>${c}</strong><br><small>${d.nome}</small></label><b onclick="event.stopPropagation(); delDisc('${sem}','${c}')" style="color:red; cursor:pointer">×</b>`;
                 lista.appendChild(item);
             }
         });
-        const excesso = totalCreditos > 36 ? 'excesso-creditos' : '';
-        coluna.innerHTML = `<h4>${sem === semestreAtivo ? '📌 ' : ''}${sem} <span class="badge-creditos ${excesso}">${totalCreditos} CR</span> <span onclick="event.stopPropagation(); removerSemestre('${sem}')">🗑</span></h4>`;
-        coluna.appendChild(lista);
-        container.appendChild(coluna);
+        col.innerHTML = `<h4>${sem === semestreAtivo ? '📌 ' : ''}${sem} <span class="badge-creditos ${cr > 36 ? 'excesso-creditos' : ''}">${cr} CR</span> <span onclick="event.stopPropagation(); delSem('${sem}')">🗑</span></h4>`;
+        col.appendChild(lista);
+        box.appendChild(col);
     });
 }
 
-function toggle(cod) {
-    if (cursadas.includes(cod)) cursadas = cursadas.filter(c => c !== cod);
-    else { cursadas.push(cod); Object.keys(plano).forEach(s => plano[s] = plano[s].filter(c => c !== cod)); }
+function toggle(c) {
+    if(cursadas.includes(c)) cursadas = cursadas.filter(x => x !== c);
+    else { cursadas.push(c); Object.keys(plano).forEach(s => plano[s] = plano[s].filter(x => x !== c)); }
     renderizarTudo();
 }
+function addAoPlano(c) { if(semestreAtivo) { plano[semestreAtivo].push(c); renderizarTudo(); } }
+function delDisc(s, c) { plano[s] = plano[s].filter(x => x !== c); renderizarTudo(); }
+function delSem(s) { if(confirm(`Remover ${s}?`)) { delete plano[s]; semestreAtivo = ""; renderizarTudo(); } }
 function addSemestre() {
-    const sems = Object.keys(plano).sort();
-    let n = "";
-    if (!sems.length) n = prompt("Semestre inicial (Ex: 2026/1):");
-    else {
-        let [ano, per] = sems[sems.length-1].split('/').map(Number);
-        n = per === 1 ? `${ano}/2` : `${ano+1}/1`;
-    }
-    if (n && !plano[n]) { plano[n] = []; semestreAtivo = n; renderizarTudo(); }
+    let sems = Object.keys(plano).sort();
+    let n = sems.length ? calcularProximoSemestre(sems[sems.length-1]) : prompt("Início (Ex: 2026/1)");
+    if(n && !plano[n]) { plano[n] = []; semestreAtivo = n; renderizarTudo(); }
 }
-function addAoPlano(cod) {
-    if (semestreAtivo && !plano[semestreAtivo].includes(cod)) { plano[semestreAtivo].push(cod); renderizarTudo(); }
-}
-function removerDoPlano(s, c) { plano[s] = plano[s].filter(x => x !== c); renderizarTudo(); }
-function removerSemestre(s) { if(confirm(`Remover ${s}?`)) { delete plano[s]; semestreAtivo = ""; renderizarTudo(); } }
-function limparDados() { if(confirm("Limpar tudo?")) { localStorage.clear(); location.reload(); } }
+function limparDados() { if(confirm("Resetar?")) { localStorage.clear(); location.reload(); } }
 function gerarPDF() { window.print(); }
-
 function exportarExcel() {
-    const n = document.getElementById('alunoNome').value || "aluno";
-    let csv = "PLANEJAMENTO;Codigo;Disciplina;Creditos\n";
-    Object.entries(plano).forEach(([s, cds]) => cds.forEach(c => csv += `${s};${c};${obrig.find(x=>x.codigo===c).nome};${parseInt(obrig.find(x=>x.codigo===c).carga_horaria)/16}\n`));
+    let csv = "PLANEJAMENTO;Codigo;Disciplina\n";
+    Object.entries(plano).forEach(([s, cds]) => cds.forEach(c => csv += `${s};${c};${obrig.find(x=>x.codigo===c).nome}\n`));
     const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = `plano_${n}.csv`;
-    link.click();
+    const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `plano_ufmt.csv`; link.click();
 }
 
 carregar();

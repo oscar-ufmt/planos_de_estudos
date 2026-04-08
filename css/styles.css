@@ -57,6 +57,7 @@ button {
     display: flex; gap: 20px; overflow-x: auto;
     padding: 15px 5px 30px 5px; align-items: flex-start;
 }
+
 .coluna-semestre {
     flex: 0 0 300px; min-width: 300px;
     background: #cbd5e1; border-radius: 12px;

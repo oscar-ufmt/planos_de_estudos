@@ -1,191 +1,92 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --primary: #003d79; --accent: #fbbf24; --bg: #f1f5f9;
-    --white: #ffffff; --border: #e2e8f0; --success: #10b981;
-    --danger: #ef4444; --warning: #f59e0b; --text-muted: #64748b;
-    --primary-light: #dbeafe;
+    --primary: #003d79; --primary-light: #dbeafe; --accent: #fbbf24;
+    --bg: #f1f5f9; --white: #ffffff; --border: #e2e8f0;
+    --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+    --text-muted: #64748b;
 }
 
 * { box-sizing: border-box; }
-
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg);
-    margin: 0;
-    padding-top: 100px;
-}
+body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; padding-top: 100px; }
 
 /* --- HEADER FIXO --- */
 .main-header {
-    background: var(--primary);
-    color: white;
-    padding: 10px 0;
-    position: fixed;
-    top: 0; left: 0; width: 100%;
-    z-index: 1000;
+    background: var(--primary); color: white; padding: 10px 0;
+    position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
-
-.header-container {
-    max-width: 1600px;
-    margin: 0 auto;
-    padding: 0 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-}
-
+.header-container { max-width: 1600px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
 .brand h1 { margin: 0; font-size: 1.2rem; letter-spacing: -1px; }
 .brand span { font-size: 0.65rem; opacity: 0.8; text-transform: uppercase; }
 
-/* --- CAMPOS DO ALUNO --- */
-.student-info {
-    display: flex;
-    gap: 10px;
-    flex: 1;
-    justify-content: center;
-}
-
+/* INPUTS ALUNO */
+.student-info { display: flex; gap: 10px; flex: 1; justify-content: center; }
 .student-info input {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    width: 100%;
-    max-width: 200px;
-    transition: 0.2s;
+    background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; width: 100%; max-width: 200px;
 }
-
 .student-info input::placeholder { color: rgba(255, 255, 255, 0.5); }
-.student-info input:focus {
-    background: rgba(255, 255, 255, 0.2);
-    border-color: var(--accent);
-    outline: none;
-}
 
 .controles { display: flex; gap: 15px; align-items: center; }
-.ppc-selector { display: flex; align-items: center; gap: 8px; }
 .actions { display: flex; gap: 8px; }
 
-/* --- BOTÕES --- */
-button {
-    padding: 8px 14px; border-radius: 8px; border: none;
-    font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
-}
-.btn-primary { background: var(--accent); color: #000; }
-.btn-outline { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); }
-.btn-outline:hover { background: white; color: var(--primary); }
-.btn-danger-outline { background: transparent; color: #fca5a5; border: 1px solid #7f1d1d; }
-
 /* --- LAYOUT KANBAN --- */
-.kanban-container {
-    display: flex; gap: 20px; overflow-x: auto;
-    padding: 15px 5px 30px 5px; align-items: flex-start;
-}
-.coluna-semestre {
-    flex: 0 0 300px; min-width: 300px;
-    background: #cbd5e1; border-radius: 12px;
-    display: flex; flex-direction: column;
-    border: 3px solid transparent; transition: 0.3s; cursor: pointer;
-}
+.kanban-container { display: flex; gap: 20px; overflow-x: auto; padding: 15px 5px 30px 5px; align-items: flex-start; }
+.coluna-semestre { flex: 0 0 300px; min-width: 300px; background: #cbd5e1; border-radius: 12px; display: flex; flex-direction: column; cursor: pointer; border: 3px solid transparent; }
 .semestre-selecionado { border-color: var(--accent) !important; background: var(--primary-light) !important; transform: scale(1.02); }
-.coluna-semestre h4 {
-    background: white; margin: 0; padding: 12px;
-    border-radius: 12px 12px 0 0; border-bottom: 3px solid var(--primary);
-    display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;
-}
-.semestre-selecionado h4 { background: var(--primary) !important; color: white !important; }
+.coluna-semestre h4 { background: white; margin: 0; padding: 12px; border-radius: 12px 12px 0 0; border-bottom: 3px solid var(--primary); display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
 
 /* --- CARDS --- */
 .lista-disciplinas-vertical, .lista-vertical-cards { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+.item-check, .card-disciplina, .mini-card { background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border); display: flex; gap: 10px; font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); align-items: center; }
+.mini-card { min-height: 100px; justify-content: space-between; }
+.mini-card button { width: 55px; height: 35px; flex-shrink: 0; background: var(--primary); color: white; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; }
 
-.item-check, .card-disciplina, .mini-card {
-    background: white; padding: 12px; border-radius: 8px;
-    border: 1px solid var(--border); display: flex; gap: 12px;
-    font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    position: relative; align-items: center;
-}
-
-.mini-card { min-height: 100px; justify-content: space-between; transition: 0.2s; }
-.mini-card button {
-    width: 55px; height: 35px; flex-shrink: 0;
-    background: var(--primary); color: white; border-radius: 6px;
-}
-
-/* --- ESTADOS --- */
+/* ESTADOS DINÂMICOS NO HISTÓRICO */
 .item-check.active { background: #dcfce7 !important; border-color: var(--success) !important; border-left: 6px solid var(--success) !important; }
-.item-check.is-planned { border: 2px solid var(--primary); background: #eff6ff; border-left: 6px solid var(--primary); }
-.alerta-pre { border-left: 6px solid var(--warning) !important; background: #fffbeb !important; }
 
-.tag-pre, .info-pre-historico {
-    font-size: 0.65rem; color: var(--danger); font-weight: 600; margin-top: 6px;
-    display: block; border-top: 1px dashed #fca5a5; padding-top: 4px;
+/* Disciplina marcada como planejada no Campo 1 */
+.item-check.is-planned {
+    background: #eff6ff !important;
+    border: 2px solid var(--primary) !important;
+    border-left: 6px solid var(--primary) !important;
 }
-.info-pre-historico { color: var(--text-muted); border-color: #eee; font-style: italic; }
 
-/* --- GRID --- */
+/* Badge de planejamento visível na tela */
+.badge-plano-screen {
+    font-size: 0.65rem;
+    color: var(--primary);
+    font-weight: 800;
+    margin-top: 5px;
+    padding: 2px 4px;
+    background: #dbeafe;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.info-pre-historico, .tag-pre { font-size: 0.65rem; color: var(--danger); font-weight: 600; margin-top: 5px; display: block; border-top: 1px dashed #eee; padding-top: 4px; }
+.badge-creditos { background: #334155; color: white; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 0.65rem; }
+
 .planejamento-split { display: grid; grid-template-columns: 380px 1fr; gap: 25px; padding: 20px; max-width: 1600px; margin: 0 auto; }
 .sidebar-pendencias { background: white; padding: 20px; border-radius: 12px; height: 75vh; overflow-y: auto; position: sticky; top: 110px; }
 
-.badge-creditos {
-    background: #334155; color: #ffffff; padding: 3px 8px;
-    border-radius: 6px; font-weight: 800; font-size: 0.65rem;
-}
-.excesso-creditos { background: var(--danger) !important; color: white !important; }
-.badge-plano-pdf { display: none; font-size: 0.65rem; color: var(--primary); font-weight: bold; margin-top: 4px; border-top: 1px solid #ccc; padding-top: 2px; }
-
-/* --- SCROLLBAR --- */
-::-webkit-scrollbar { height: 12px; width: 8px; }
-::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
-::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; border: 3px solid #e2e8f0; }
-
 /* --- PDF / IMPRESSÃO --- */
 @media print {
-    header {
-        position: static !important;
-        background: white !important;
-        color: black !important;
-        box-shadow: none !important;
-        padding: 0 !important;
-        border-bottom: 2px solid black;
-    }
+    header { position: static !important; background: white !important; color: black !important; box-shadow: none !important; border-bottom: 2px solid black; }
     .header-container { display: block !important; }
     .brand h1 { color: black !important; font-size: 2rem !important; }
-
-    /* Transforma inputs em texto simples no PDF */
-    .student-info {
-        display: block !important;
-        margin-top: 15px;
-    }
-    .student-info input {
-        border: none !important;
-        background: transparent !important;
-        color: black !important;
-        padding: 0 !important;
-        font-size: 1.1rem !important;
-        font-weight: bold !important;
-        max-width: none !important;
-        margin-bottom: 5px;
-        display: block;
-    }
-    /* Adiciona labels no PDF */
-    #alunoNome::before { content: "Nome: "; font-weight: normal; }
-    #alunoRGA::before { content: "RGA: "; font-weight: normal; }
-    #alunoSEI::before { content: "Processo SEI: "; font-weight: normal; }
-
-    .controles, .actions, .sidebar-pendencias, .area-grade, button, input[type="checkbox"], .coluna-semestre h4 span {
-        display: none !important;
-    }
-
+    .student-info { display: block !important; margin-top: 20px; }
+    .student-info input { border: none !important; background: transparent !important; color: black !important; padding: 0 !important; font-size: 1.2rem !important; font-weight: bold !important; max-width: none !important; margin-bottom: 10px; display: block; }
+    .controles, .actions, .sidebar-pendencias, .area-grade, button, input[type="checkbox"], .coluna-semestre h4 span { display: none !important; }
     body { background: white; padding-top: 0; }
     .secao-historico { display: block !important; width: 100% !important; }
-    .kanban-container { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 15px !important; overflow: visible !important; }
+    .kanban-container { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; overflow: visible !important; }
     .coluna-semestre { width: 100% !important; min-width: 100% !important; background: white !important; border: 1px solid #000 !important; page-break-inside: avoid; }
     .coluna-semestre h4 { background: #eee !important; color: black !important; border-bottom: 1px solid black !important; }
     .item-check { border: 1px solid #999 !important; display: block !important; box-shadow: none !important; }
-    .badge-plano-pdf { display: block !important; }
+    .badge-plano-screen { background: none; border: 1px solid #ccc; color: black; }
 }
+
+::-webkit-scrollbar { height: 12px; width: 8px; }
+::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }

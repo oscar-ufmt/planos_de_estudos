@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-    --primary: #003d79; --primary-light: #dbeafe; --accent: #fbbf24;
-    --bg: #f1f5f9; --white: #ffffff; --border: #e2e8f0;
-    --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
-    --text-muted: #64748b;
+    --primary: #003d79; --accent: #fbbf24; --bg: #f1f5f9;
+    --white: #ffffff; --border: #e2e8f0; --success: #10b981;
+    --danger: #ef4444; --warning: #f59e0b; --text-muted: #64748b;
+    --primary-light: #dbeafe;
 }
 
 * { box-sizing: border-box; }
@@ -13,7 +13,7 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: var(--bg);
     margin: 0;
-    padding-top: 90px; /* Espaço para o header fixo */
+    padding-top: 100px; /* Espaço para o header fixo */
 }
 
 /* --- HEADER FIXO --- */
@@ -109,8 +109,22 @@ button {
 .planejamento-split { display: grid; grid-template-columns: 380px 1fr; gap: 25px; padding: 20px; max-width: 1600px; margin: 0 auto; }
 .sidebar-pendencias { background: white; padding: 20px; border-radius: 12px; height: 75vh; overflow-y: auto; position: sticky; top: 110px; }
 
-.badge-creditos { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-weight: 800; font-size: 0.6rem; }
-.excesso-creditos { background: var(--danger) !important; color: white; }
+/* --- COMPONENTES (CRÉDITOS) --- */
+.badge-creditos {
+    background: #334155; /* Cinza Ardósia Escuro para contraste */
+    color: #ffffff;      /* Texto Branco */
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 0.65rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.excesso-creditos {
+    background: var(--danger) !important;
+    color: white !important;
+}
+
 .badge-plano-pdf { display: none; font-size: 0.65rem; color: var(--primary); font-weight: bold; margin-top: 4px; border-top: 1px solid #ccc; padding-top: 2px; }
 
 /* --- SCROLLBAR --- */

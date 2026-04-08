@@ -382,5 +382,33 @@
     "prerequisitos": ["114200400"],
     "ppc_20251": 10,
     "ppc_20261": 10
+  },
+  {
+    "codigo": "114200404",
+    "nome": " Estágio Curricular Supervisionado",
+    "carga_horaria": "160h",
+    "prerequisitos": ["114200314","114300017"],
+    "ppc_20251": 10,
+    "ppc_20261": 10
   }
+,
+  {
+    "codigo": "114200402",
+    "nome": " Atividades Complementares",
+    "carga_horaria": "160h",
+    "prerequisitos": [],
+    "ppc_20251": 10,
+    "ppc_20261": 10
+  }
+,
+  {
+    "codigo": "114200403",
+    "nome": " Atividades de Extensão",
+    "carga_horaria": "384h",
+    "prerequisitos": [],
+    "ppc_20251": 10,
+    "ppc_20261": 10
+  }
+
+
 ]

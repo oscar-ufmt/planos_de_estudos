@@ -1,1 +1,112 @@
-<h1>Meu Plano de Estudos</h1>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Plano de Estudos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        .filtros {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .semestre {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .disciplina {
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tag {
+            font-size: 0.8em;
+            margin-left: 8px;
+            padding: 2px 6px;
+            border-radius: 5px;
+        }
+
+        .ppc-ambos { background: #d4edda; }
+        .ppc-20251 { background: #fff3cd; }
+        .ppc-20261 { background: #cce5ff; }
+
+        button {
+            margin-top: 10px;
+            padding: 8px 12px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Planejamento de Estudos</h2>
+
+<!-- 🔹 FILTROS -->
+<div class="filtros">
+
+    <label>Semestre:
+        <select id="semestre">
+            <option>2026/1</option>
+            <option selected>2026/2</option>
+            <option>2027/1</option>
+        </select>
+    </label>
+
+    <br><br>
+
+    <label>
+        <input type="checkbox" checked> PPC 2025/1
+    </label>
+
+    <label>
+        <input type="checkbox" checked> PPC 2026/1
+    </label>
+
+</div>
+
+<!-- 🔹 LISTA DE DISCIPLINAS -->
+<div id="lista-disciplinas">
+
+    <div class="semestre">
+        <h3>Semestre 2026/2</h3>
+
+        <div class="disciplina">
+            <input type="checkbox">
+            COMP101 - Algoritmos I
+            <span class="tag ppc-ambos">20251 | 20261</span>
+        </div>
+
+        <div class="disciplina">
+            <input type="checkbox">
+            COMP202 - Inteligência Artificial
+            <span class="tag ppc-20261">20261</span>
+        </div>
+
+        <div class="disciplina">
+            <input type="checkbox">
+            COMP150 - Circuitos Digitais
+            <span class="tag ppc-20251">20251</span>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- 🔹 AÇÕES -->
+<button>Adicionar semestre</button>
+<button>Gerar Relatório</button>
+
+</body>
+</html>

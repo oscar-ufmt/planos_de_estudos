@@ -413,7 +413,7 @@
   {
     "codigo": "1",
     "nome": "Optativa I",
-    "carga_horaria": "64",
+    "carga_horaria": "64h",
     "prerequisitos": [],
     "ppc_20251": 8,
     "ppc_20261": 8
@@ -421,7 +421,7 @@
   {
     "codigo": "2",
     "nome": "Optativa II",
-    "carga_horaria": "64",
+    "carga_horaria": "64h",
     "prerequisitos": [],
     "ppc_20251": 8,
     "ppc_20261": 9
@@ -429,7 +429,7 @@
   {
     "codigo": "3",
     "nome": "Optativa III",
-    "carga_horaria": "64",
+    "carga_horaria": "64h",
     "prerequisitos": [],
     "ppc_20251": 8,
     "ppc_20261": 10

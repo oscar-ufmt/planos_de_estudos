@@ -18,7 +18,7 @@ async function carregar() {
         if (sems.length > 0) semestreAtivo = sems[sems.length - 1];
         carregarInfoAdicional();
         renderizarTudo();
-    } catch (e) { console.error("Erro no carregamento."); }
+    } catch (e) { console.error("Erro JSON"); }
 }
 
 function somarSemestres(ano, sem, qtd) {
@@ -48,7 +48,6 @@ function calcularPrazos() {
         cursados = (aP * 2 + (sP - 1)) - totalIngresso - tranc;
     }
 
-    // Lógica correta: Máximo permitido menos os gastos.
     let faltantes = regra.max - (cursados < 0 ? 0 : cursados);
 
     const painel = document.getElementById('painelPrazos');
@@ -59,6 +58,57 @@ function calcularPrazos() {
         <div class="card-prazo"><b>Semestres Cursados</b>${cursados < 0 ? 0 : cursados}</div>
         <div class="card-prazo"><b>Restantes p/ Limite</b>${faltantes < 0 ? 0 : faltantes}</div>
     `;
+}
+
+function salvarInfoAdicional() {
+    const info = {
+        nome: document.getElementById('alunoNome').value,
+        sei: document.getElementById('alunoSEI').value,
+        anoIng: document.getElementById('ingressoAno').value,
+        semIng: document.getElementById('ingressoSemestre').value,
+        ppcIng: document.getElementById('ppcIngresso').value,
+        tranc: document.getElementById('trancamentos').value
+    };
+    localStorage.setItem('info_aluno_ufmt', JSON.stringify(info));
+    calcularPrazos();
+}
+
+function carregarInfoAdicional() {
+    const info = JSON.parse(localStorage.getItem('info_aluno_ufmt'));
+    if (info) {
+        document.getElementById('alunoNome').value = info.nome || "";
+        document.getElementById('alunoSEI').value = info.sei || "";
+        document.getElementById('ingressoAno').value = info.anoIng || "2022";
+        document.getElementById('ingressoSemestre').value = info.semIng || "1";
+        document.getElementById('ppcIngresso').value = info.ppcIng || "2026";
+        document.getElementById('trancamentos').value = info.tranc || "0";
+    }
+    calcularPrazos();
+}
+
+function importarJSON(e) {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        try {
+            const d = JSON.parse(ev.target.result);
+            // Salva no LocalStorage
+            localStorage.setItem('cursadas_ufmt', JSON.stringify(d.cursadas || []));
+            localStorage.setItem('plano_ufmt', JSON.stringify(d.plano || {}));
+            localStorage.setItem('info_aluno_ufmt', JSON.stringify(d.info || d.infoAluno || {}));
+
+            // Recarrega as variáveis globais
+            cursadas = d.cursadas || [];
+            plano = d.plano || {};
+
+            // Força a atualização da interface e dos campos
+            carregarInfoAdicional();
+            renderizarTudo();
+            alert("Dados importados com sucesso!");
+        } catch (err) {
+            alert("Erro ao importar JSON. Verifique o arquivo.");
+        }
+    };
+    reader.readAsText(e.target.files[0]);
 }
 
 function renderizarTudo() {
@@ -98,8 +148,6 @@ function renderizarTudo() {
     renderizarPendencias();
     renderizarGrade();
     calcularPrazos();
-    localStorage.setItem('cursadas_ufmt', JSON.stringify(cursadas));
-    localStorage.setItem('plano_ufmt', JSON.stringify(plano));
 }
 
 function renderizarPendencias() {
@@ -112,7 +160,7 @@ function renderizarPendencias() {
         const cumpre = preReqCodes.every(p => cursadas.includes(p));
         const preReqNomes = preReqCodes.map(c => obrig.find(o => o.codigo === c)?.nome || c).join(', ');
         const div = document.createElement('div');
-        div.className = `mini-card ${!cumpre ? 'alerta-pre' : ''}`; // AMARELO SE NÃO CUMPRE REQ
+        div.className = `mini-card ${!cumpre ? 'alerta-pre' : ''}`;
         div.innerHTML = `<div style="flex:1"><b>${d.codigo}</b><br>${d.nome}
             ${preReqNomes ? `<div class="tag-pre">Req: ${preReqNomes}</div>` : ''}</div>
             <button onclick="addAoPlano('${d.codigo}')" class="btn-primary">ADD</button>`;
@@ -147,6 +195,8 @@ function toggle(c) {
     if(cursadas.includes(c)) cursadas = cursadas.filter(x=>x!==c);
     else { cursadas.push(c); Object.keys(plano).forEach(s => plano[s] = plano[s].filter(id => id !== c)); }
     renderizarTudo();
+    localStorage.setItem('cursadas_ufmt', JSON.stringify(cursadas));
+    localStorage.setItem('plano_ufmt', JSON.stringify(plano));
 }
 function addAoPlano(c) { if(semestreAtivo) { plano[semestreAtivo].push(c); renderizarTudo(); } }
 function delDisc(s, c) { plano[s] = plano[s].filter(x=>x!==c); renderizarTudo(); }
@@ -156,37 +206,9 @@ function addSemestre() {
     let n = sems.length ? somarSemestres(parseInt(sems[sems.length-1].split('/')[0]), parseInt(sems[sems.length-1].split('/')[1]), 2).formatado : prompt("Início (Ex: 2026/1)");
     if(n && !plano[n]) { plano[n] = []; semestreAtivo = n; renderizarTudo(); }
 }
-function salvarInfoAdicional() {
-    const info = { nome: document.getElementById('alunoNome').value, sei: document.getElementById('alunoSEI').value, anoIng: document.getElementById('ingressoAno').value, semIng: document.getElementById('ingressoSemestre').value, ppcIng: document.getElementById('ppcIngresso').value, tranc: document.getElementById('trancamentos').value };
-    localStorage.setItem('info_aluno_ufmt', JSON.stringify(info));
-    calcularPrazos();
-}
-function carregarInfoAdicional() {
-    const info = JSON.parse(localStorage.getItem('info_aluno_ufmt'));
-    if (info) {
-        document.getElementById('alunoNome').value = info.nome || "";
-        document.getElementById('alunoSEI').value = info.sei || "";
-        document.getElementById('ingressoAno').value = info.anoIng || "2022";
-        document.getElementById('ingressoSemestre').value = info.semIng || "1";
-        document.getElementById('ppcIngresso').value = info.ppcIng || "2026";
-        document.getElementById('trancamentos').value = info.tranc || "0";
-    }
-    calcularPrazos();
-}
 function exportarJSON() {
-    const blob = new Blob([JSON.stringify({cursadas, plano, info: JSON.parse(localStorage.getItem('info_aluno_ufmt'))})], {type:'application/json'});
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = 'plano_ufmt.json'; a.click();
-}
-function importarJSON(e) {
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-        const d = JSON.parse(ev.target.result);
-        localStorage.setItem('cursadas_ufmt', JSON.stringify(d.cursadas || []));
-        localStorage.setItem('plano_ufmt', JSON.stringify(d.plano || {}));
-        localStorage.setItem('info_aluno_ufmt', JSON.stringify(d.info || {}));
-        location.reload();
-    };
-    reader.readAsText(e.target.files[0]);
+    const blob = new Blob([JSON.stringify({cursadas, plano, info: JSON.parse(localStorage.getItem('info_aluno_ufmt'))}, null, 2)], {type:'application/json'});
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = 'plano_estudos.json'; a.click();
 }
 function exportarExcel() {
     const nome = document.getElementById('alunoNome').value || "ALUNO";

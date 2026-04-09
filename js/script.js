@@ -63,12 +63,12 @@ function calcularPrazos() {
             <b>⚠️ Limite Máximo (Jubilamento)</b>
             Máximo: ${pMax} | Dilação: ${pDil}
         </div>
-        <div class="card-prazo"><b>📚 Limite Semestral</b>Máximo: ${regra.limiteCr} CR</div>
+        <div class="card-prazo"><b>📚 Limite Créditos</b>Máximo: ${regra.limiteCr} CR</div>
     `;
 
     if(alertaJubilamento) {
         painel.innerHTML += `<div class="card-prazo alerta" style="grid-column: 1/-1">
-            <b>🚨 ALERTA:</b> Seu plano termina em ${ultimoSemPlan}, excedendo o limite de ${pMax}.
+            🚨 Atenção: Seu plano se estende até ${ultimoSemPlan}, excedendo o limite de ${pMax}.
         </div>`;
     }
 }
@@ -130,7 +130,7 @@ function renderizarTudo() {
                 <input type="checkbox" id="c-${d.codigo}" ${isChecked ? 'checked' : ''} onchange="toggle('${d.codigo}')">
                 <label for="c-${d.codigo}">
                     <strong>${d.codigo}</strong><small>${d.nome}</small>
-                    ${planejado ? `<div style="font-size:0.6rem; color:var(--primary); font-weight:700; margin-top:4px">📅 Planejada: ${planejado}</div>` : ''}
+                    ${planejado ? `<div style="font-size:0.55rem; color:var(--primary); font-weight:700; margin-top:2px">📅 Planejada: ${planejado}</div>` : ''}
                     ${preReqs ? `<div class="tag-pre">Req: ${preReqs}</div>` : ''}
                 </label>`;
             lista.appendChild(item);
@@ -202,7 +202,7 @@ function renderizarGrade() {
                 const item = document.createElement('div');
                 item.className = 'card-disciplina';
                 item.innerHTML = `<label style="flex:1"><strong>${c}</strong><br><small>${d.nome}</small></label>
-                    <b onclick="event.stopPropagation(); delDisc('${sem}','${c}')" style="color:red; cursor:pointer; font-size:1.2rem">×</b>`;
+                    <b onclick="event.stopPropagation(); delDisc('${sem}','${c}')" style="color:red; cursor:pointer; font-size:1.1rem">×</b>`;
                 lista.appendChild(item);
             }
         });
@@ -213,6 +213,40 @@ function renderizarGrade() {
         col.appendChild(lista);
         box.appendChild(col);
     });
+}
+
+function exportarExcel() {
+    const nomeAluno = document.getElementById('alunoNome').value || "ALUNO";
+    const ppcTexto = document.getElementById('filtroPPC').options[document.getElementById('filtroPPC').selectedIndex].text;
+
+    let csv = `SUGESTÃO DE PLANO DE ESTUDOS;;;;\n`;
+    csv += `DISCIPLINA DO PPC ${ppcTexto};;;;\n\n`;
+    csv += `CÓDIGO;CARGA HORÁRIA;NOME;Ano;Semestre\n`;
+
+    const sems = Object.keys(plano).sort();
+    sems.forEach(semKey => {
+        const [ano, periodo] = semKey.split('/');
+        const cods = plano[semKey];
+        cods.forEach((c, index) => {
+            const d = obrig.find(x => x.codigo === c);
+            if (d) {
+                const colAno = (index === 0) ? ano : "";
+                const colSem = (index === 0) ? periodo : "";
+                csv += `${c};${d.carga_horaria};${d.nome};${colAno};${colSem}\n`;
+            }
+        });
+        csv += `;;;; \n`;
+    });
+
+    csv += `\n114200404;160;Estágio Curricular Supervisionado;;\n`;
+    csv += `114200403;384;Atividades de Extensão;;\n`;
+    csv += `114200402;160;Atividades Complementares;;\n`;
+
+    const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `PLANO_${nomeAluno.toUpperCase()}.csv`;
+    link.click();
 }
 
 function toggle(c) {
@@ -230,11 +264,5 @@ function addSemestre() {
 }
 function limparDados() { if(confirm("Resetar?")) { localStorage.clear(); location.reload(); } }
 function gerarPDF() { window.print(); }
-function exportarExcel() {
-    let csv = "PLANEJAMENTO;Codigo;Disciplina\n";
-    Object.entries(plano).forEach(([s, cds]) => cds.forEach(c => csv += `${s};${c};${obrig.find(x=>x.codigo===c).nome}\n`));
-    const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `plano_estudos.csv`; link.click();
-}
 
 carregar();

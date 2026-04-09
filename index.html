@@ -19,7 +19,8 @@
         <div class="student-info">
             <input type="text" id="alunoNome" placeholder="Nome do Discente" oninput="salvarInfoAdicional()">
             <input type="text" id="alunoRGA" placeholder="RGA" oninput="salvarInfoAdicional()">
-            <input type="text" id="alunoSEI" placeholder="Processo SEI" oninput="salvarInfoAdicional()">
+            <!-- maxlength aumentado para 100 caracteres -->
+            <input type="text" id="alunoSEI" placeholder="Processo SEI" oninput="salvarInfoAdicional()" maxlength="100">
         </div>
 
         <div class="controles">
@@ -58,7 +59,6 @@
             <div id="listaDisponiveis" class="lista-vertical-cards"></div>
         </aside>
 
-        
         <section class="area-grade">
             <header class="section-header">
                 <h3>3. Planejamento Próximos Semestres</h3>

@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
 :root {
     --primary: #003d79; --primary-light: #dbeafe; --accent: #fbbf24;
     --bg: #f1f5f9; --white: #ffffff; --border: #e2e8f0;
@@ -8,9 +6,9 @@
 }
 
 * { box-sizing: border-box; }
-body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; padding-top: 100px; }
+body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; padding-top: 110px; }
 
-/* HEADER FIXO */
+/* HEADER */
 .main-header {
     background: var(--primary); color: white; padding: 10px 0;
     position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
@@ -24,8 +22,13 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0;
 .student-info { display: flex; gap: 10px; flex: 1; justify-content: center; }
 .student-info input {
     background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; width: 100%; max-width: 200px;
+    color: white; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; width: 100%;
 }
+#alunoNome { max-width: 250px; }
+#alunoRGA { max-width: 120px; }
+/* Ajuste de largura do Processo SEI */
+#alunoSEI { max-width: 350px; flex-grow: 1; }
+
 .student-info input::placeholder { color: rgba(255, 255, 255, 0.5); }
 
 .controles { display: flex; gap: 15px; align-items: center; }
@@ -37,13 +40,13 @@ button { padding: 8px 14px; border-radius: 8px; border: none; font-size: 0.8rem;
 .btn-outline { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); }
 .btn-danger-outline { background: transparent; color: #fca5a5; border: 1px solid #7f1d1d; }
 
-/* LAYOUT KANBAN */
+/* KANBAN */
 .kanban-container { display: flex; gap: 20px; overflow-x: auto; padding: 15px 5px 30px 5px; align-items: flex-start; }
 .coluna-semestre { flex: 0 0 300px; min-width: 300px; background: #cbd5e1; border-radius: 12px; display: flex; flex-direction: column; cursor: pointer; border: 3px solid transparent; transition: 0.3s; }
 .semestre-selecionado { border-color: var(--accent) !important; background: var(--primary-light) !important; transform: scale(1.02); }
 .coluna-semestre h4 { background: white; margin: 0; padding: 12px; border-radius: 12px 12px 0 0; border-bottom: 3px solid var(--primary); display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
 
-/* CARDS PADRONIZADOS */
+/* CARDS */
 .lista-disciplinas-vertical, .lista-vertical-cards { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
 .item-check, .card-disciplina, .mini-card {
     background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border);
@@ -51,38 +54,21 @@ button { padding: 8px 14px; border-radius: 8px; border: none; font-size: 0.8rem;
     align-items: center; min-height: 90px;
 }
 
-/* CAMPO 2 ESPECÍFICO */
-.mini-card { justify-content: space-between; transition: 0.2s; }
-.info-pendente { flex: 1; }
-.info-pendente strong { color: var(--primary); display: block; margin-bottom: 2px; }
-.mini-card button { width: 55px; height: 35px; flex-shrink: 0; background: var(--primary); color: white; border-radius: 6px; font-weight: bold; }
-
 /* ESTADOS */
 .item-check.active { background: #dcfce7 !important; border-color: var(--success) !important; border-left: 8px solid var(--success) !important; }
 .item-check.is-planned { background: #eff6ff !important; border: 2px solid var(--primary) !important; border-left: 8px solid var(--primary) !important; }
+.alerta-pre { background: #fffbeb !important; border-left: 8px solid var(--warning) !important; }
 
-/* ALERTA AMARELO (PRÉ-REQUISITO NÃO CUMPRIDO) */
-.alerta-pre {
-    background: #fffbeb !important; /* Amarelo claro */
-    border-left: 8px solid var(--warning) !important; /* Barra laranja/amarela lateral */
-}
-
-.info-pre-historico, .tag-pre { font-size: 0.65rem; color: var(--danger); font-weight: 600; margin-top: 5px; display: block; border-top: 1px dashed #eee; padding-top: 4px; }
-.badge-plano-screen { font-size: 0.65rem; color: var(--primary); font-weight: 800; margin-top: 5px; padding: 2px 4px; background: #dbeafe; border-radius: 4px; }
-.badge-creditos { background: #334155; color: white; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 0.65rem; }
-
+.secao-historico { padding: 20px; max-width: 1600px; margin: 0 auto; }
 .planejamento-split { display: grid; grid-template-columns: 380px 1fr; gap: 25px; padding: 20px; max-width: 1600px; margin: 0 auto; }
 .sidebar-pendencias { background: white; padding: 20px; border-radius: 12px; height: 75vh; overflow-y: auto; position: sticky; top: 110px; }
 
-/* PDF */
+/* PRINT */
 @media print {
     header { position: static !important; background: white !important; color: black !important; box-shadow: none !important; border-bottom: 2px solid black; }
     .student-info { display: block !important; margin-top: 20px; }
-    .student-info input { border: none !important; background: transparent !important; color: black !important; font-size: 1.2rem !important; font-weight: bold !important; display: block; }
-    .controles, .actions, .sidebar-pendencias, .area-grade, button, input[type="checkbox"], .coluna-semestre h4 span { display: none !important; }
+    .student-info input { border: none !important; background: transparent !important; color: black !important; font-size: 1.2rem !important; font-weight: bold !important; display: block; max-width: 100% !important; }
+    .controles, .actions, .sidebar-pendencias, .area-grade, button, input[type="checkbox"] { display: none !important; }
     body { background: white; padding-top: 0; }
-    .secao-historico { display: block !important; width: 100% !important; }
     .kanban-container { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; overflow: visible !important; }
-    .coluna-semestre { width: 100% !important; min-width: 100% !important; background: white !important; border: 1px solid #000 !important; page-break-inside: avoid; }
-    .item-check { border: 1px solid #999 !important; display: block !important; }
 }

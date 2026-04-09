@@ -11,7 +11,7 @@ const REGRAS_OFERTA = {
     "2028/1": { "20261": [1, 3, 5, 9, 10], "20251": [6, 8, 9, 10] },
     "2028/2": { "20261": [2, 4, 6, 9, 10], "20251": [7, 9, 10] },
     "2029/1": { "20261": [1, 3, 5, 7, 9, 10], "20251": [8, 9, 10] },
-    "2029/2": { "20261": [2, 4, 6, 8, 9, 10], "20251": [] } // 2025/1 Extinto
+    "2029/2": { "20261": [2, 4, 6, 8, 9, 10], "20251": [] }
 };
 
 async function carregar() {
@@ -22,7 +22,7 @@ async function carregar() {
         if (sems.length > 0) semestreAtivo = sems[sems.length - 1];
         carregarInfoAdicional();
         renderizarTudo();
-    } catch (e) { alert("Erro ao carregar dados."); }
+    } catch (e) { console.error("Erro ao carregar dados.", e); }
 }
 
 function salvarInfoAdicional() {
@@ -106,25 +106,18 @@ function renderizarPendencias(ppcKey) {
 
     obrig.filter(d => {
         let estaOfertada = false;
-
         if (oferta) {
-            // Lógica durante a transição (2026/1 até 2029/2)
             if (d.ppc_20261 && oferta["20261"].includes(d.ppc_20261)) estaOfertada = true;
             if (d.ppc_20251 && oferta["20251"].includes(d.ppc_20251)) estaOfertada = true;
         } else if (anoAtivo >= 2030 || (anoAtivo === 2029 && periodoAtivo === 2)) {
-            // LÓGICA DE EXTINÇÃO: A partir de 2029/2 ou 2030+, o PPC 2025/1 NÃO EXISTE MAIS.
-            // Apenas disciplinas que estão no PPC 2026/1 são ofertadas,
-            // respeitando paridade (ímpar no /1 e par no /2)
             const semestreDesejado = d.ppc_20261;
             if (semestreDesejado) {
                 if (periodoAtivo === 1 && semestreDesejado % 2 !== 0) estaOfertada = true;
                 if (periodoAtivo === 2 && semestreDesejado % 2 === 0) estaOfertada = true;
             }
         } else {
-            // Fallback para datas antes de 2026
             estaOfertada = !!d[ppcKey];
         }
-
         return estaOfertada && !cursadas.includes(d.codigo) && !jaPlano.includes(d.codigo);
     }).forEach(d => {
         const preReqCodes = d.prerequisitos || [];
@@ -177,7 +170,7 @@ function toggle(c) {
 function addAoPlano(c) { if(semestreAtivo) { plano[semestreAtivo].push(c); renderizarTudo(); } }
 function delDisc(s, c) { plano[s] = plano[s].filter(x => x !== c); renderizarTudo(); }
 function removerSemestre(s) {
-    if(confirm(`Deseja remover o semestre ${s} e todas as disciplinas planejadas nele?`)) {
+    if(confirm(`Deseja remover o semestre ${s}?`)) {
         delete plano[s];
         semestreAtivo = "";
         renderizarTudo();

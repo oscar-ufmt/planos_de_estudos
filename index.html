@@ -58,6 +58,9 @@
             <div class="actions">
                 <button onclick="gerarPDF()" class="btn-outline">📄 PDF</button>
                 <button onclick="exportarExcel()" class="btn-outline">📊 Excel</button>
+                <button onclick="exportarJSON()" class="btn-outline" title="Salvar backup do plano">📤 Exportar</button>
+                <button onclick="document.getElementById('inputImport').click()" class="btn-outline" title="Carregar backup do plano">📥 Importar</button>
+                <input type="file" id="inputImport" style="display:none" accept=".json" onchange="importarJSON(event)">
                 <button onclick="addSemestre()" class="btn-primary">+ Novo Semestre</button>
                 <button onclick="limparDados()" class="btn-danger-outline">Resetar</button>
             </div>

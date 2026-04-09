@@ -7,7 +7,6 @@
 * { box-sizing: border-box; }
 body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; padding-top: 150px; }
 
-/* HEADER */
 .main-header {
     background: var(--primary); color: white; padding: 10px 0;
     position: fixed; top: 0; width: 100%; z-index: 1000;
@@ -28,7 +27,9 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0;
     background: white; border: none; border-radius: 3px; padding: 2px 5px; font-size: 0.65rem; color: #333;
 }
 
-/* PAINEL DE PRAZOS */
+.controles { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
+.actions { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+
 .painel-prazos {
     max-width: 1600px; margin: 0 auto 15px; padding: 0 20px;
     display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px;
@@ -40,7 +41,6 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0;
 .card-prazo b { display: block; color: var(--primary); margin-bottom: 2px; font-size: 0.75rem; }
 .card-prazo.alerta { border-left-color: var(--danger); background: #fff1f1; }
 
-/* COLUNAS E CARDS - REDUZIDOS */
 .kanban-container { display: flex; gap: 15px; overflow-x: auto; padding: 10px 5px 20px; }
 .coluna-semestre { flex: 0 0 280px; min-width: 280px; background: #cbd5e1; border-radius: 10px; display: flex; flex-direction: column; border: 2px solid transparent; }
 .semestre-selecionado { border-color: var(--accent) !important; background: var(--primary-light) !important; }
@@ -53,11 +53,10 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0;
 
 .lista-disciplinas-vertical, .lista-vertical-cards { padding: 8px; display: flex; flex-direction: column; gap: 8px; }
 
-/* Cards mais compactos */
 .item-check, .card-disciplina, .mini-card {
     background: white; padding: 10px; border-radius: 6px; border: 1px solid var(--border);
     display: flex; gap: 8px; font-size: 0.7rem; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    align-items: center; min-height: 70px; /* Reduzido de 95px */
+    align-items: center; min-height: 70px;
 }
 
 .mini-card button {
@@ -67,7 +66,6 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0;
 
 .badge-creditos { background: #334155; color: white; padding: 2px 6px; border-radius: 4px; font-weight: 800; font-size: 0.6rem; }
 
-/* ESTADOS */
 .item-check.active { background: #dcfce7 !important; border-left: 6px solid var(--success) !important; }
 .item-check.is-planned { background: #eff6ff !important; border: 1.5px solid var(--primary) !important; border-left: 6px solid var(--primary) !important; }
 .alerta-pre { background: #fffbeb !important; border-left: 6px solid var(--warning) !important; }
@@ -78,8 +76,11 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0;
 .sidebar-pendencias { background: white; padding: 15px; border-radius: 12px; height: 75vh; overflow-y: auto; position: sticky; top: 160px; }
 
 @media print {
-    .main-header, .sidebar-pendencias, .painel-prazos, button { display: none !important; }
+    .main-header { position: absolute !important; background: white !important; color: black !important; box-shadow: none !important; border-bottom: 2px solid #000; }
+    .student-info { display: block !important; margin-top: 10px; width: 100%; }
+    .input-row input { color: black !important; background: transparent !important; border: none !important; font-size: 1.1rem !important; font-weight: bold !important; display: block !important; width: 100% !important; }
+    .academic-config, .controles, .actions, .sidebar-pendencias, .painel-prazos, button, input[type="checkbox"] { display: none !important; }
     body { padding-top: 0; }
-    .kanban-container { display: block !important; }
-    .coluna-semestre { width: 100% !important; border: 1px solid #000 !important; margin-bottom: 15px; page-break-inside: avoid; }
+    .kanban-container { display: block !important; width: 100% !important; margin-top: 180px; }
+    .coluna-semestre { width: 100% !important; margin-bottom: 15px; border: 1px solid #000 !important; background: white !important; page-break-inside: avoid; }
 }

@@ -8,7 +8,7 @@
 * { box-sizing: border-box; }
 body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; padding-top: 110px; }
 
-/* HEADER */
+/* HEADER FIXO */
 .main-header {
     background: var(--primary); color: white; padding: 10px 0;
     position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
@@ -18,7 +18,7 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0;
 .brand h1 { margin: 0; font-size: 1.2rem; letter-spacing: -1px; }
 .brand span { font-size: 0.65rem; opacity: 0.8; text-transform: uppercase; }
 
-/* INPUTS ALUNO */
+/* INPUTS CABEÇALHO */
 .student-info { display: flex; gap: 10px; flex: 1; justify-content: center; }
 .student-info input {
     background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
@@ -26,27 +26,26 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0;
 }
 #alunoNome { max-width: 250px; }
 #alunoRGA { max-width: 120px; }
-/* Ajuste de largura do Processo SEI */
-#alunoSEI { max-width: 350px; flex-grow: 1; }
+#alunoSEI { max-width: 350px; flex-grow: 1; } /* Expandido para caber o processo */
 
 .student-info input::placeholder { color: rgba(255, 255, 255, 0.5); }
 
 .controles { display: flex; gap: 15px; align-items: center; }
 .actions { display: flex; gap: 8px; }
 
-/* BOTÕES */
+/* BOTÕES GERAIS */
 button { padding: 8px 14px; border-radius: 8px; border: none; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
 .btn-primary { background: var(--accent); color: #000; }
 .btn-outline { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); }
 .btn-danger-outline { background: transparent; color: #fca5a5; border: 1px solid #7f1d1d; }
 
-/* KANBAN */
+/* KANBAN / GRADES */
 .kanban-container { display: flex; gap: 20px; overflow-x: auto; padding: 15px 5px 30px 5px; align-items: flex-start; }
 .coluna-semestre { flex: 0 0 300px; min-width: 300px; background: #cbd5e1; border-radius: 12px; display: flex; flex-direction: column; cursor: pointer; border: 3px solid transparent; transition: 0.3s; }
 .semestre-selecionado { border-color: var(--accent) !important; background: var(--primary-light) !important; transform: scale(1.02); }
 .coluna-semestre h4 { background: white; margin: 0; padding: 12px; border-radius: 12px 12px 0 0; border-bottom: 3px solid var(--primary); display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
 
-/* CARDS */
+/* CARDS DISCIPLINAS */
 .lista-disciplinas-vertical, .lista-vertical-cards { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
 .item-check, .card-disciplina, .mini-card {
     background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border);
@@ -54,14 +53,36 @@ button { padding: 8px 14px; border-radius: 8px; border: none; font-size: 0.8rem;
     align-items: center; min-height: 90px;
 }
 
-/* ESTADOS */
+/* BOTÃO ADD (CAMPO 2 - PENDÊNCIAS) - RESTAURADO AO PADRÃO ORIGINAL */
+.mini-card { justify-content: space-between; }
+.mini-card button {
+    background: var(--accent);
+    color: #000;
+    width: 60px;
+    height: 35px;
+    flex-shrink: 0;
+    font-weight: 800;
+    border-radius: 6px;
+}
+.mini-card button:hover { filter: brightness(0.9); transform: scale(1.05); }
+
+.info-pendente { flex: 1; }
+.info-pendente strong { color: var(--primary); display: block; margin-bottom: 2px; }
+
+/* ESTADOS DE STATUS */
 .item-check.active { background: #dcfce7 !important; border-color: var(--success) !important; border-left: 8px solid var(--success) !important; }
 .item-check.is-planned { background: #eff6ff !important; border: 2px solid var(--primary) !important; border-left: 8px solid var(--primary) !important; }
 .alerta-pre { background: #fffbeb !important; border-left: 8px solid var(--warning) !important; }
 
-.secao-historico { padding: 20px; max-width: 1600px; margin: 0 auto; }
+/* ESTRUTURA DE LAYOUT */
+.section-header { padding: 0 20px; }
+.secao-historico { padding: 10px 0; max-width: 1600px; margin: 0 auto; }
 .planejamento-split { display: grid; grid-template-columns: 380px 1fr; gap: 25px; padding: 20px; max-width: 1600px; margin: 0 auto; }
 .sidebar-pendencias { background: white; padding: 20px; border-radius: 12px; height: 75vh; overflow-y: auto; position: sticky; top: 110px; }
+
+.info-pre-historico, .tag-pre { font-size: 0.65rem; color: var(--danger); font-weight: 600; margin-top: 5px; border-top: 1px dashed #eee; padding-top: 4px; }
+.badge-plano-screen { font-size: 0.65rem; color: var(--primary); font-weight: 800; margin-top: 5px; padding: 2px 4px; background: #dbeafe; border-radius: 4px; }
+.badge-creditos { background: #334155; color: white; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 0.65rem; }
 
 /* PRINT */
 @media print {

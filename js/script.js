@@ -22,7 +22,7 @@ async function carregar() {
         if (sems.length > 0) semestreAtivo = sems[sems.length - 1];
         carregarInfoAdicional();
         renderizarTudo();
-    } catch (e) { console.error("Erro ao carregar dados.", e); }
+    } catch (e) { console.error("Erro ao carregar dados."); }
 }
 
 function salvarInfoAdicional() {

@@ -7,6 +7,7 @@
 * { box-sizing: border-box; }
 body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0; padding-top: 140px; }
 
+/* HEADER */
 .main-header {
     background: var(--primary); color: white; padding: 10px 0;
     position: fixed; top: 0; width: 100%; z-index: 1000;
@@ -29,6 +30,7 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0;
 
 .controles { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; }
 
+/* PAINEL DE PRAZOS */
 .painel-prazos {
     max-width: 1600px; margin: 0 auto 20px; padding: 0 20px;
     display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;
@@ -40,9 +42,10 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0;
 .card-prazo b { display: block; color: var(--primary); margin-bottom: 4px; font-size: 0.8rem; }
 .card-prazo.alerta { border-left-color: var(--danger); background: #fff1f1; }
 
+/* KANBAN */
 .kanban-container { display: flex; gap: 20px; overflow-x: auto; padding: 10px 5px 20px; align-items: flex-start; }
-.coluna-semestre { flex: 0 0 300px; min-width: 300px; background: #cbd5e1; border-radius: 12px; display: flex; flex-direction: column; cursor: pointer; transition: 0.2s; }
-.semestre-selecionado { border: 3px solid var(--accent) !important; background: var(--primary-light) !important; }
+.coluna-semestre { flex: 0 0 300px; min-width: 300px; background: #cbd5e1; border-radius: 12px; display: flex; flex-direction: column; border: 3px solid transparent; }
+.semestre-selecionado { border-color: var(--accent) !important; background: var(--primary-light) !important; }
 
 .coluna-semestre h4 {
     background: white; margin: 0; padding: 10px; border-radius: 12px 12px 0 0;
@@ -50,28 +53,42 @@ body { font-family: 'Inter', sans-serif; background-color: var(--bg); margin: 0;
     border-bottom: 2px solid var(--primary);
 }
 
-.lista-disciplinas-vertical { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+/* CARDS PADRONIZADOS (O segredo da unificação) */
+.lista-disciplinas-vertical, .lista-vertical-cards { padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+
 .item-check, .card-disciplina, .mini-card {
-    background: white; padding: 10px; border-radius: 8px; border: 1px solid var(--border);
-    display: flex; gap: 10px; font-size: 0.75rem; align-items: center; min-height: 80px;
+    background: white; padding: 12px; border-radius: 8px; border: 1px solid var(--border);
+    display: flex; gap: 10px; font-size: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    align-items: center; min-height: 90px; position: relative;
 }
 
-.badge-creditos { background: #334155; color: white; padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.65rem; }
+/* BOTÃO ADD (CAMPO 2) - RESTAURADO */
+.mini-card { justify-content: space-between; }
+.mini-card button {
+    background: var(--accent); color: #000;
+    width: 55px; height: 35px; flex-shrink: 0;
+    font-weight: 800; border-radius: 6px; cursor: pointer; border: none;
+    transition: 0.2s; font-size: 0.7rem;
+}
+.mini-card button:hover { filter: brightness(0.9); transform: scale(1.05); }
+
+/* BADGES E ESTADOS */
+.badge-creditos { background: #334155; color: white; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 0.65rem; }
 .excesso-creditos { background: var(--danger) !important; animation: pulse 1.5s infinite; }
-@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
 
-.item-check.active { background: #dcfce7 !important; border-left: 6px solid var(--success) !important; }
-.item-check.is-planned { background: #eff6ff !important; border-left: 6px solid var(--primary) !important; }
-.alerta-pre { background: #fffbeb !important; border-left: 6px solid var(--warning) !important; }
+.item-check.active { background: #dcfce7 !important; border-left: 8px solid var(--success) !important; }
+.item-check.is-planned { background: #eff6ff !important; border: 2px solid var(--primary) !important; border-left: 8px solid var(--primary) !important; }
+.alerta-pre { background: #fffbeb !important; border-left: 8px solid var(--warning) !important; }
 
-.mini-card button { background: var(--accent); color: #000; font-weight: 800; border-radius: 4px; padding: 5px 10px; cursor: pointer; border:none; }
+.tag-pre { font-size: 0.65rem; color: var(--danger); font-weight: 600; margin-top: 5px; display: block; border-top: 1px dashed #eee; padding-top: 4px; }
 
-.planejamento-split { display: grid; grid-template-columns: 380px 1fr; gap: 20px; padding: 20px; max-width: 1600px; margin: 0 auto; }
-.sidebar-pendencias { background: white; padding: 15px; border-radius: 12px; height: 70vh; overflow-y: auto; position: sticky; top: 150px; }
+.planejamento-split { display: grid; grid-template-columns: 380px 1fr; gap: 25px; padding: 20px; max-width: 1600px; margin: 0 auto; }
+.sidebar-pendencias { background: white; padding: 20px; border-radius: 12px; height: 75vh; overflow-y: auto; position: sticky; top: 150px; }
 
 @media print {
     .main-header, .controles, .actions, .sidebar-pendencias, button, .painel-prazos { display: none !important; }
     body { padding-top: 0; background: white; }
-    .kanban-container { display: block !important; }
-    .coluna-semestre { width: 100% !important; margin-bottom: 20px; border: 1px solid #000 !important; }
+    .kanban-container { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; }
+    .coluna-semestre { width: 100% !important; border: 1px solid #000 !important; page-break-inside: avoid; }
 }

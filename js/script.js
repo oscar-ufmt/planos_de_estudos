@@ -3,12 +3,11 @@ let cursadas = JSON.parse(localStorage.getItem('cursadas_ufmt')) || [];
 let plano = JSON.parse(localStorage.getItem('plano_ufmt')) || {};
 let semestreAtivo = "";
 
-// Configurações de prazos conforme tabelas
 const REGRAS_PPC = {
     "2014": { min: 10, max: 15, dil: 17.5, limiteCr: 40 },
     "2020": { min: 8,  max: 12, dil: 14,   limiteCr: 32 },
     "2025": { min: 10, max: 15, dil: 17.5, limiteCr: 36 },
-    "2026": { min: 10, max: 15, dil: 17.5, limiteCr: 36 } // Mesma regra do 2025
+    "2026": { min: 10, max: 15, dil: 17.5, limiteCr: 36 }
 };
 
 const REGRAS_OFERTA = {
@@ -59,29 +58,26 @@ function calcularPrazos() {
 
     const painel = document.getElementById('painelPrazos');
     painel.innerHTML = `
-        <div class="card-prazo"><b>🎓 Mínimo para Formatura</b>PPC ${ppcIng}: ${pMin}</div>
+        <div class="card-prazo"><b>🎓 Mínimo Formatura</b>PPC ${ppcIng}: ${pMin}</div>
         <div class="card-prazo ${alertaJubilamento ? 'alerta' : ''}">
             <b>⚠️ Limite Máximo (Jubilamento)</b>
-            Sem dilação: ${pMax} <br> Com dilação: ${pDil}
+            Máximo: ${pMax} | Dilação: ${pDil}
         </div>
-        <div class="card-prazo"><b>📚 Carga Horária Semestral</b>Máximo: ${regra.limiteCr} Créditos</div>
+        <div class="card-prazo"><b>📚 Limite Semestral</b>Máximo: ${regra.limiteCr} CR</div>
     `;
 
     if(alertaJubilamento) {
         painel.innerHTML += `<div class="card-prazo alerta" style="grid-column: 1/-1">
-            <b>🚨 AVISO DE PRAZO:</b> Seu planejamento vai até ${ultimoSemPlan}, superando o limite de ${pMax}.
+            <b>🚨 ALERTA:</b> Seu plano termina em ${ultimoSemPlan}, excedendo o limite de ${pMax}.
         </div>`;
     }
 }
 
 function salvarInfoAdicional() {
     const info = {
-        nome: document.getElementById('alunoNome').value,
-        rga: document.getElementById('alunoRGA').value,
-        sei: document.getElementById('alunoSEI').value,
-        anoIng: document.getElementById('ingressoAno').value,
-        semIng: document.getElementById('ingressoSemestre').value,
-        ppcIng: document.getElementById('ppcIngresso').value,
+        nome: document.getElementById('alunoNome').value, rga: document.getElementById('alunoRGA').value,
+        sei: document.getElementById('alunoSEI').value, anoIng: document.getElementById('ingressoAno').value,
+        semIng: document.getElementById('ingressoSemestre').value, ppcIng: document.getElementById('ppcIngresso').value,
         tranc: document.getElementById('trancamentos').value
     };
     localStorage.setItem('info_aluno_ufmt', JSON.stringify(info));
@@ -134,8 +130,8 @@ function renderizarTudo() {
                 <input type="checkbox" id="c-${d.codigo}" ${isChecked ? 'checked' : ''} onchange="toggle('${d.codigo}')">
                 <label for="c-${d.codigo}">
                     <strong>${d.codigo}</strong><small>${d.nome}</small>
-                    ${planejado ? `<div style="font-size:0.6rem; color:var(--primary); font-weight:bold">📅 Planejada: ${planejado}</div>` : ''}
-                    ${preReqs ? `<div style="color:var(--danger); font-size:0.6rem">Req: ${preReqs}</div>` : ''}
+                    ${planejado ? `<div style="font-size:0.6rem; color:var(--primary); font-weight:700; margin-top:4px">📅 Planejada: ${planejado}</div>` : ''}
+                    ${preReqs ? `<div class="tag-pre">Req: ${preReqs}</div>` : ''}
                 </label>`;
             lista.appendChild(item);
         });
@@ -152,7 +148,7 @@ function renderizarTudo() {
 
 function renderizarPendencias(ppcKey) {
     const box = document.getElementById('listaDisponiveis');
-    box.innerHTML = semestreAtivo ? '' : '<p style="color:red; font-size:0.7rem">Selecione um semestre.</p>';
+    box.innerHTML = semestreAtivo ? '' : '<p style="color:red; font-size:0.7rem; padding:10px">Selecione um semestre.</p>';
     if (!semestreAtivo) return;
 
     const jaPlano = Object.values(plano).flat();
@@ -172,9 +168,15 @@ function renderizarPendencias(ppcKey) {
     }).forEach(d => {
         const preReqCodes = d.prerequisitos || [];
         const cumpre = preReqCodes.every(p => cursadas.includes(p));
+        const preReqNomes = preReqCodes.map(c => obrig.find(o => o.codigo === c)?.nome || c).join(', ');
+
         const div = document.createElement('div');
         div.className = `mini-card ${!cumpre ? 'alerta-pre' : ''}`;
-        div.innerHTML = `<div class="info-pendente"><strong>${d.codigo}</strong><small>${d.nome}</small></div>
+        div.innerHTML = `
+            <div style="flex:1">
+                <strong>${d.codigo}</strong><small>${d.nome}</small>
+                ${preReqNomes ? `<div class="tag-pre">Req: ${preReqNomes}</div>` : ''}
+            </div>
             <button onclick="addAoPlano('${d.codigo}')">ADD</button>`;
         box.appendChild(div);
     });
@@ -199,8 +201,8 @@ function renderizarGrade() {
                 cr += (parseInt(d.carga_horaria) || 0) / 16;
                 const item = document.createElement('div');
                 item.className = 'card-disciplina';
-                item.innerHTML = `<label><strong>${c}</strong><br><small>${d.nome}</small></label>
-                    <b onclick="event.stopPropagation(); delDisc('${sem}','${c}')" style="color:red; cursor:pointer">×</b>`;
+                item.innerHTML = `<label style="flex:1"><strong>${c}</strong><br><small>${d.nome}</small></label>
+                    <b onclick="event.stopPropagation(); delDisc('${sem}','${c}')" style="color:red; cursor:pointer; font-size:1.2rem">×</b>`;
                 lista.appendChild(item);
             }
         });

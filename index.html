@@ -31,7 +31,7 @@
                     </select>
                 </div>
                 <div class="config-item">
-                    <label>PPC:</label>
+                    <label>PPC Ingresso:</label>
                     <select id="ppcIngresso" onchange="salvarInfoAdicional()">
                         <option value="2014">2014</option>
                         <option value="2020">2020</option>
@@ -59,11 +59,13 @@
 </header>
 
 <main class="app-layout">
+    <!-- Dashboard de Cálculos e Progresso -->
     <div id="painelPrazos" class="painel-prazos"></div>
 
+    <!-- 1. Fluxograma (Topo) -->
     <section class="secao-historico">
         <header class="section-header">
-            <h3>1. Fluxograma (Clique para marcar como Cursada)</h3>
+            <h3>1. Fluxograma de Disciplinas (Clique para marcar como Cursada)</h3>
             <div class="filtro-box">
                 <label>Ver Oferta PPC:</label>
                 <select id="filtroPPC" onchange="renderizarTudo()">
@@ -75,13 +77,15 @@
         <div id="checklistObrigatorias" class="kanban-container"></div>
     </section>
 
+    <!-- 2 e 3. Pendências e Planejamento -->
     <div class="planejamento-split">
         <aside class="sidebar-pendencias">
-            <h3>2. Pendências (Ofertadas no semestre selecionado)</h3>
+            <h3>2. Pendências</h3>
             <div id="listaDisponiveis" class="lista-vertical-cards"></div>
         </aside>
+
         <section class="area-grade">
-            <h3>3. Planejamento (Selecione um semestre para ver ofertas)</h3>
+            <h3>3. Planejamento</h3>
             <div id="gradeSemestres" class="kanban-container"></div>
         </section>
     </div>

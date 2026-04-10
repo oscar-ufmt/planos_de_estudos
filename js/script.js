@@ -216,11 +216,26 @@ function importarJSON(e) {
     reader.readAsText(e.target.files[0]);
 }
 function exportarJSON() {
-    const blob = new Blob([JSON.stringify({cursadas, plano, info: JSON.parse(localStorage.getItem('info_aluno_ufmt'))}, null, 2)], {type:'application/json'});
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = 'plano_ufmt.json'; a.click();
+    const nomeRaw = document.getElementById('alunoNome').value || "aluno";
+    const nomeFormatado = nomeRaw.toLowerCase().replace(/\s/g, "_");
+
+    const dados = {
+        cursadas,
+        plano,
+        info: JSON.parse(localStorage.getItem('info_aluno_ufmt'))
+    };
+
+    const blob = new Blob([JSON.stringify(dados, null, 2)], {type:'application/json'});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `plano_estudos_${nomeFormatado}.json`;
+    a.click();
 }
+
 function exportarExcel() {
-    const nome = document.getElementById('alunoNome').value || "ALUNO";
+    const nomeRaw = document.getElementById('alunoNome').value || "aluno";
+    const nomeFormatado = nomeRaw.toLowerCase().replace(/\s/g, "_");
+
     let csv = `CÓDIGO;CARGA HORÁRIA;NOME;Ano;Semestre\n`;
     Object.keys(plano).sort().forEach(s => {
         const [ano, sem] = s.split('/');
@@ -230,10 +245,22 @@ function exportarExcel() {
         });
         csv += `;;;;\n`;
     });
+
     const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `PLANO_${nome.toUpperCase()}.csv`; a.click();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `plano_estudos_${nomeFormatado}.csv`;
+    a.click();
 }
-function gerarPDF() { window.print(); }
+function gerarPDF() {
+    const nomeRaw = document.getElementById('alunoNome').value || "aluno";
+    const nomeFormatado = nomeRaw.toLowerCase().replace(/\s/g, "_");
+    const tituloOriginal = document.title;
+
+    document.title = `plano_estudos_${nomeFormatado}`; // O navegador usa isso como nome do arquivo PDF
+    window.print();
+    document.title = tituloOriginal; // Restaura o título original após abrir a tela de impressão
+}
 function limparDados() { if(confirm("Resetar?")) { localStorage.clear(); location.reload(); } }
 
 carregar();

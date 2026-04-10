@@ -10,6 +10,17 @@ const REGRAS_PPC = {
     "2026": { min: 10, max: 15, dil: 17.5 }
 };
 
+const REGRAS_OFERTA = {
+    "2026/1": { "20261": [1, 9, 10], "20251": [2, 4, 6, 8, 9, 10] },
+    "2026/2": { "20261": [2, 9, 10], "20251": [3, 5, 7, 9, 10] },
+    "2027/1": { "20261": [1, 3, 9, 10], "20251": [4, 6, 8, 9, 10] },
+    "2027/2": { "20261": [2, 4, 9, 10], "20251": [5, 7, 9, 10] },
+    "2028/1": { "20261": [1, 3, 5, 9, 10], "20251": [6, 8, 9, 10] },
+    "2028/2": { "20261": [2, 4, 6, 9, 10], "20251": [7, 9, 10] },
+    "2029/1": { "20261": [1, 3, 5, 7, 9, 10], "20251": [8, 9, 10] },
+    "2029/2": { "20261": [2, 4, 6, 8, 9, 10], "20251": [] }
+};
+
 async function carregar() {
     try {
         const res = await fetch('./data/disciplinas_obrigatorias.json');
@@ -18,7 +29,7 @@ async function carregar() {
         if (sems.length > 0) semestreAtivo = sems[sems.length - 1];
         carregarInfoAdicional();
         renderizarTudo();
-    } catch (e) { console.error("Erro JSON"); }
+    } catch (e) { alert("Erro ao carregar banco de dados."); }
 }
 
 function somarSemestres(ano, sem, qtd) {
@@ -60,57 +71,6 @@ function calcularPrazos() {
     `;
 }
 
-function salvarInfoAdicional() {
-    const info = {
-        nome: document.getElementById('alunoNome').value,
-        sei: document.getElementById('alunoSEI').value,
-        anoIng: document.getElementById('ingressoAno').value,
-        semIng: document.getElementById('ingressoSemestre').value,
-        ppcIng: document.getElementById('ppcIngresso').value,
-        tranc: document.getElementById('trancamentos').value
-    };
-    localStorage.setItem('info_aluno_ufmt', JSON.stringify(info));
-    calcularPrazos();
-}
-
-function carregarInfoAdicional() {
-    const info = JSON.parse(localStorage.getItem('info_aluno_ufmt'));
-    if (info) {
-        document.getElementById('alunoNome').value = info.nome || "";
-        document.getElementById('alunoSEI').value = info.sei || "";
-        document.getElementById('ingressoAno').value = info.anoIng || "2022";
-        document.getElementById('ingressoSemestre').value = info.semIng || "1";
-        document.getElementById('ppcIngresso').value = info.ppcIng || "2026";
-        document.getElementById('trancamentos').value = info.tranc || "0";
-    }
-    calcularPrazos();
-}
-
-function importarJSON(e) {
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-        try {
-            const d = JSON.parse(ev.target.result);
-            // Salva no LocalStorage
-            localStorage.setItem('cursadas_ufmt', JSON.stringify(d.cursadas || []));
-            localStorage.setItem('plano_ufmt', JSON.stringify(d.plano || {}));
-            localStorage.setItem('info_aluno_ufmt', JSON.stringify(d.info || d.infoAluno || {}));
-
-            // Recarrega as variáveis globais
-            cursadas = d.cursadas || [];
-            plano = d.plano || {};
-
-            // Força a atualização da interface e dos campos
-            carregarInfoAdicional();
-            renderizarTudo();
-            alert("Dados importados com sucesso!");
-        } catch (err) {
-            alert("Erro ao importar JSON. Verifique o arquivo.");
-        }
-    };
-    reader.readAsText(e.target.files[0]);
-}
-
 function renderizarTudo() {
     const ppcKey = `ppc_${document.getElementById('filtroPPC').value}`;
     const mapaPlano = {};
@@ -148,22 +108,41 @@ function renderizarTudo() {
     renderizarPendencias();
     renderizarGrade();
     calcularPrazos();
+    localStorage.setItem('cursadas_ufmt', JSON.stringify(cursadas));
+    localStorage.setItem('plano_ufmt', JSON.stringify(plano));
 }
 
 function renderizarPendencias() {
     const box = document.getElementById('listaDisponiveis');
-    box.innerHTML = semestreAtivo ? '' : '<p style="padding:10px">Selecione um semestre.</p>';
+    box.innerHTML = semestreAtivo ? '' : '<p style="padding:10px; color:red">Selecione um semestre no Plano para ver ofertas.</p>';
     if (!semestreAtivo) return;
-    const ja = [...cursadas, ...Object.values(plano).flat()];
-    obrig.filter(d => !ja.includes(d.codigo)).forEach(d => {
+
+    const jaMap = [...cursadas, ...Object.values(plano).flat()];
+    const oferta = REGRAS_OFERTA[semestreAtivo];
+    const [anoAtivo, periodoAtivo] = semestreAtivo.split('/').map(Number);
+
+    obrig.filter(d => {
+        if (jaMap.includes(d.codigo)) return false;
+
+        let ofertada = false;
+        if (oferta) {
+            if (d.ppc_20261 && oferta["20261"].includes(d.ppc_20261)) ofertada = true;
+            if (d.ppc_20251 && oferta["20251"].includes(d.ppc_20251)) ofertada = true;
+        } else if (anoAtivo >= 2030) {
+            const semD = d.ppc_20261;
+            if (semD && ((periodoAtivo === 1 && semD % 2 !== 0) || (periodoAtivo === 2 && semD % 2 === 0))) ofertada = true;
+        }
+        return ofertada;
+    }).forEach(d => {
         const preReqCodes = d.prerequisitos || [];
         const cumpre = preReqCodes.every(p => cursadas.includes(p));
         const preReqNomes = preReqCodes.map(c => obrig.find(o => o.codigo === c)?.nome || c).join(', ');
+
         const div = document.createElement('div');
         div.className = `mini-card ${!cumpre ? 'alerta-pre' : ''}`;
         div.innerHTML = `<div style="flex:1"><b>${d.codigo}</b><br>${d.nome}
             ${preReqNomes ? `<div class="tag-pre">Req: ${preReqNomes}</div>` : ''}</div>
-            <button onclick="addAoPlano('${d.codigo}')" class="btn-primary">ADD</button>`;
+            <button onclick="addAoPlano('${d.codigo}')" class="btn-primary" style="padding:5px; width:50px; font-size:0.6rem">ADD</button>`;
         box.appendChild(div);
     });
 }
@@ -195,8 +174,6 @@ function toggle(c) {
     if(cursadas.includes(c)) cursadas = cursadas.filter(x=>x!==c);
     else { cursadas.push(c); Object.keys(plano).forEach(s => plano[s] = plano[s].filter(id => id !== c)); }
     renderizarTudo();
-    localStorage.setItem('cursadas_ufmt', JSON.stringify(cursadas));
-    localStorage.setItem('plano_ufmt', JSON.stringify(plano));
 }
 function addAoPlano(c) { if(semestreAtivo) { plano[semestreAtivo].push(c); renderizarTudo(); } }
 function delDisc(s, c) { plano[s] = plano[s].filter(x=>x!==c); renderizarTudo(); }
@@ -206,9 +183,41 @@ function addSemestre() {
     let n = sems.length ? somarSemestres(parseInt(sems[sems.length-1].split('/')[0]), parseInt(sems[sems.length-1].split('/')[1]), 2).formatado : prompt("Início (Ex: 2026/1)");
     if(n && !plano[n]) { plano[n] = []; semestreAtivo = n; renderizarTudo(); }
 }
+function salvarInfoAdicional() {
+    const info = { nome: document.getElementById('alunoNome').value, sei: document.getElementById('alunoSEI').value, anoIng: document.getElementById('ingressoAno').value, semIng: document.getElementById('ingressoSemestre').value, ppcIng: document.getElementById('ppcIngresso').value, tranc: document.getElementById('trancamentos').value };
+    localStorage.setItem('info_aluno_ufmt', JSON.stringify(info));
+    calcularPrazos();
+}
+function carregarInfoAdicional() {
+    const info = JSON.parse(localStorage.getItem('info_aluno_ufmt'));
+    if (info) {
+        document.getElementById('alunoNome').value = info.nome || "";
+        document.getElementById('alunoSEI').value = info.sei || "";
+        document.getElementById('ingressoAno').value = info.anoIng || "2022";
+        document.getElementById('ingressoSemestre').value = info.semIng || "1";
+        document.getElementById('ppcIngresso').value = info.ppcIng || "2026";
+        document.getElementById('trancamentos').value = info.tranc || "0";
+    }
+    calcularPrazos();
+}
+function importarJSON(e) {
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+        const d = JSON.parse(ev.target.result);
+        localStorage.setItem('cursadas_ufmt', JSON.stringify(d.cursadas || []));
+        localStorage.setItem('plano_ufmt', JSON.stringify(d.plano || {}));
+        localStorage.setItem('info_aluno_ufmt', JSON.stringify(d.info || d.infoAluno || {}));
+        cursadas = d.cursadas || [];
+        plano = d.plano || {};
+        carregarInfoAdicional();
+        renderizarTudo();
+        alert("Importado!");
+    };
+    reader.readAsText(e.target.files[0]);
+}
 function exportarJSON() {
     const blob = new Blob([JSON.stringify({cursadas, plano, info: JSON.parse(localStorage.getItem('info_aluno_ufmt'))}, null, 2)], {type:'application/json'});
-    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = 'plano_estudos.json'; a.click();
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = 'plano_ufmt.json'; a.click();
 }
 function exportarExcel() {
     const nome = document.getElementById('alunoNome').value || "ALUNO";
@@ -225,6 +234,6 @@ function exportarExcel() {
     const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `PLANO_${nome.toUpperCase()}.csv`; a.click();
 }
 function gerarPDF() { window.print(); }
-function limparDados() { if(confirm("Resetar todos os dados?")) { localStorage.clear(); location.reload(); } }
+function limparDados() { if(confirm("Resetar?")) { localStorage.clear(); location.reload(); } }
 
 carregar();

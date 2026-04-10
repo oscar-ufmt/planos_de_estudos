@@ -49,8 +49,8 @@
         <div class="actions">
             <button onclick="gerarPDF()" class="btn-outline">📄 PDF</button>
             <button onclick="exportarExcel()" class="btn-outline">📊 Excel</button>
-            <button onclick="exportarJSON()" class="btn-outline">📤 Exportar JSON</button>
-            <button onclick="document.getElementById('inputImport').click()" class="btn-outline">📥 Importar JSON</button>
+            <button onclick="exportarJSON()" class="btn-outline">📤 Exportar</button>
+            <button onclick="document.getElementById('inputImport').click()" class="btn-outline">📥 Importar</button>
             <input type="file" id="inputImport" style="display:none" accept=".json" onchange="importarJSON(event)">
             <button onclick="addSemestre()" class="btn-primary">+ Semestre</button>
             <button onclick="limparDados()" class="btn-danger-outline">Resetar</button>
@@ -59,14 +59,13 @@
 </header>
 
 <main class="app-layout">
-    <!-- Dashboard de Cálculos -->
     <div id="painelPrazos" class="painel-prazos"></div>
 
     <section class="secao-historico">
         <header class="section-header">
-            <h3>1. Fluxograma de Disciplinas (Clique para marcar)</h3>
+            <h3>1. Fluxograma (Clique para marcar como Cursada)</h3>
             <div class="filtro-box">
-                <label>Oferta PPC:</label>
+                <label>Ver Oferta PPC:</label>
                 <select id="filtroPPC" onchange="renderizarTudo()">
                     <option value="20251">2025/1</option>
                     <option value="20261" selected>2026/1</option>
@@ -78,11 +77,11 @@
 
     <div class="planejamento-split">
         <aside class="sidebar-pendencias">
-            <h3>2. Pendências</h3>
+            <h3>2. Pendências (Ofertadas no semestre selecionado)</h3>
             <div id="listaDisponiveis" class="lista-vertical-cards"></div>
         </aside>
         <section class="area-grade">
-            <h3>3. Planejamento</h3>
+            <h3>3. Planejamento (Selecione um semestre para ver ofertas)</h3>
             <div id="gradeSemestres" class="kanban-container"></div>
         </section>
     </div>
